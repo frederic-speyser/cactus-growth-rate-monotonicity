@@ -9,6 +9,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 (nothing yet)
 
+## [1.1] - 2026-08-07
+
+### Changed
+- `README.md` — added the Zenodo DOI of this repository (v1.0) to the
+  Citation section, replacing the placeholder.
+- `CHANGELOG.md` — this entry.
+
 ## [1.0] - 2026-08-07
 
 ### Added
