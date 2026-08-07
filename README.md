@@ -54,7 +54,7 @@ No formalization connecting the abstract involution-counting principle to actual
 
 ## Citation
 
-If you use this code, please cite the paper listed at the top of the References section above. A citable archive of this repository will be added here via Zenodo once deposited.
+If you use this code, please cite the paper listed at the top of the References section above. A citable archive of this repository is available via Zenodo: [10.5281/zenodo.21840267](https://doi.org/10.5281/zenodo.21840267).
 
 ## Author
 
