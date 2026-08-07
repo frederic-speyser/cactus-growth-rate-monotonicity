@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to this repository are documented in this file, with a
+date on each entry.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [Unreleased]
+
+(nothing yet)
+
+## [1.0] - 2026-08-07
+
+### Added
+- `coq/convexity_lemma.v` — Lemma 1 (§4), the analytic convexity lemma,
+  proved via the mean value theorem.
+- `coq/operator_monotonicity.v` — Lemma 2 (§4) in full, including the true
+  infinite series (Coquelicot), not merely its elementary building blocks.
+- `coq/involution_counting.v` — the abstract counting principle behind
+  Theorem 2 (§5), generalized to any type with decidable equality and
+  instantiated concretely for *m* = 5.
+- `coq/coefficient_stabilization.v` — a finite-order computational
+  confirmation, for *m* = 5 truncated at degree 13, that the Picard
+  iteration defining the rooted series stabilizes.
+- `python/` — the exact-rational series solver adapted from the companion
+  enumeration paper (see README for the full reference), the symbolic
+  (sympy) verification of the algebraic identities of §5–7, and the
+  derivation of an explicit lower bound on ρ₅.
+- `README.md` — overview, rationale, scope, requirements, references,
+  citation placeholder.
+
+### Notes
+- Preprint and Zenodo archive of the paper itself: not yet available (see
+  README).
