@@ -1,14 +1,13 @@
 # Verification code for "Strict Monotonicity of the Growth Rate for Non-Plane Strict *m*-Gonal Cactus Graphs"
 
 
-
 ## Rationale
 
 In [2], I enumerate strict non-plane *m*-gonal cactus graphs for each fixed *m* ≥ 5, and conjecture (Conjecture 1) that the exponential growth rate 1/ρ*m* of this family is strictly decreasing in *m*, on strong numerical evidence but without a proof.
 
 This repository accompanies the paper that proves it. The proof combines a purely combinatorial lower bound on the growth rate, a non-circular monotonicity result for the sequence of rooted generating functions obtained by controlling the Picard iterates of the defining functional equation, and a differential criterion obtained from a convexity property of the underlying fixed-point operator.
 
-Three pieces of this proof have been independently verified by machine, using the Coq proof assistant: the convexity lemma, the operator monotonicity lemma (with its true infinite series, not a finite approximation), and the abstract combinatorial counting principle behind the paper's chain-cactus argument. Two of these three carry no axioms beyond Coq's core logic.
+Three pieces of this proof have been independently verified by machine, using the Coq proof assistant: the convexity lemma, the operator monotonicity lemma (with its true infinite series, not a finite approximation), and the abstract combinatorial counting principle behind the paper's chain-cactus argument. One of these three — the counting principle — carries no axioms at all; the other two rely only on the classical axioms already standard throughout Coq's own Reals library, nothing introduced by this work itself.
 
 **On the role of this code.** The mathematical proof is complete in the paper itself, on paper, independently of any code. The material in this repository consists of tests performed afterward, using independent methods — exact symbolic computation, and mechanized checking in the Coq proof assistant — to check specific claims made in the proof: algebraic identities, numerical bounds, and one abstract combinatorial principle. This code does not replace or complete the proof; it is a supplementary layer of verification, in the same spirit as the independent PARI/GP implementation and structural tests already used to cross-check the enumerative data of [2].
 
@@ -32,14 +31,14 @@ The preprint of [2] is available on Zenodo (DOI [10.5281/zenodo.21461100](https:
 
 No mechanized proof of Theorem 3 (§6) itself, nor of the paper's main theorem as a whole. The Coq developments above verify specific lemmas and an abstract principle underlying the argument, not the full inductive proof or its combinatorial content.
 
-No formalization of the general convergence theorem for Picard iterates on the true functional equation (as opposed to a finite coefficient prefix): this rests on citing Pivoteau, Salvy and Soria's extension of Joyal's implicit species theorem, whose hypotheses have been checked to apply to the present equation, but which is not reproved here.
+No formalization of the general convergence theorem for Picard iterates on the true functional equation (as opposed to a finite coefficient prefix): this rests on citing Pivoteau, Salvy and Soria's [5] extension of Joyal's implicit species theorem, whose hypotheses have been checked to apply to the present equation, but which is not reproved here.
 
 No formalization connecting the abstract involution-counting principle to actual cactus graphs and their split-decomposition trees: this would require formalizing graph theory and split-decomposition itself, a substantially larger undertaking not attempted here.
 
 ## Requirements
 
-- **Coq** 8.18 or later, with the **Coquelicot** library, to compile the files in `coq/`.
-- **Python** 3, with `sympy`, `numpy`, and `mpmath`, to run the scripts in `python/`.
+- **Coq** 8.18 or later to compile the files in `coq/`; the **Coquelicot** library is additionally required for `operator_monotonicity.v` only.
+- **Python** 3, with `sympy` and `numpy`, to run the scripts in `python/`.
 
 ## References
 
@@ -59,8 +58,7 @@ If you use this code, please cite the paper listed at the top of the References 
 
 ## Author
 
-Frédéric G. Speyser - Independent Researcher, France
-ORCID: 0000-0002-1767-5325
+Frédéric G. Speyser - Independent Researcher, France - ORCID: 0000-0002-1767-5325
 
 ## License
 
