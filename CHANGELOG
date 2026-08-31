@@ -5,7 +5,7 @@ date on each entry.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [2.0] - 2026-08-31
 
 - `python/verify_theorem_equiv_symbolic.py` - new: independent symbolic
   (SymPy) verification of the algebraic chain in the proof of Theorem
@@ -17,8 +17,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   arithmetic, block-indexed, agreeing with `critical_point.py` to
   within 3x10^-5.
 - `README.md` - updated to list both additions.
-
-## [2.0] - 2026-08-31
 
 ### Changed - consolidation into the preprint
 This release brings the repository into line with the paper as it now
