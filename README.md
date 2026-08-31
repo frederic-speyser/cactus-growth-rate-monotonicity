@@ -4,6 +4,9 @@ This repository accompanies the paper that proves the growth-rate monotonicity c
 
 A series of working papers accompanied the consolidation and preparation of this result. The working paper itself has since been consolidated into a single, self-contained work, and this repository has been updated to match it exactly: every script here verifies a claim that appears, under the same theorem/table numbers, in the current preprint, titled "Strict Monotonicity and a Lambert-W Asymptotic for Growth Rates of Non-Plane Strict m-Gonal Cacti."
 
+ 
+See the **[companion page](docs/index.html)** for an overview of the results and a verification matrix linking each claim to the script that checks it (includes a summary in French).
+
 Specifically, the paper proves:
 
 - **Strict monotonicity.** The radius of convergence rho_m of the rooted enumeration series is strictly increasing in m - the exponential growth rate 1/rho_m is strictly decreasing. The proof combines a purely combinatorial lower bound, a non-circular monotonicity result for the sequence of rooted generating functions (via controlled Picard iterates of the defining functional equation), and a differential criterion from a convexity property of the underlying fixed-point operator.
