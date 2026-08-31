@@ -7,33 +7,84 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-(nothing yet)
+- `python/verify_theorem_equiv_symbolic.py` - new: independent symbolic
+  (SymPy) verification of the algebraic chain in the proof of Theorem
+  5.3 (the v*e^v=e^(-1) substitution, the derivative at the fixed
+  point, the Taylor expansion used in the transfer step). All four
+  checks pass exactly.
+- `pari/verify_critical_pari.gp` - new: independent recomputation of
+  rho_m (Table 3) using native PARI/GP truncated power series
+  arithmetic, block-indexed, agreeing with `critical_point.py` to
+  within 3x10^-5.
+- `README.md` - updated to list both additions.
+
+## [2.0] - 2026-08-31
+
+### Changed - consolidation into the preprint
+This release brings the repository into line with the paper as it now
+stands: a single, self-contained preprint titled "Strict Monotonicity and
+a Lambert-W Asymptotic for Growth Rates of Non-Plane Strict m-Gonal
+Cacti" (DOI: 10.5281/zenodo.22206801). The paper now includes the full
+proof of the transfer/asymptotic theorem (previously only cited from the
+companion enumeration paper) and a new central result: a closed-form
+large-m equivalent for 1-rho_m, with a Lambert-W constant, proved in full
+(Theorem 5.3).
+
+- `README.md` - rewritten to match the new title, scope, and file set;
+  added the Citation section with the preprint's own DOI and this
+  repository's DOI.
+- `paper/` - added: LaTeX source and compiled PDF of the preprint.
+
+### Added
+- `python/verify_transfer_constants.py` - independent finite-difference
+  recomputation of Phi_y and Phi_hh (Table 3), by a route genuinely
+  different from the paper's closed-form derivation.
+- `python/extended_range_m30.py` - extends the critical-data table and
+  the check of the two-term asymptotic equivalent from m=12 to m=30,
+  confirming the O((log m)/m^2) error term numerically over a much wider
+  range than previously checked.
+
+### Fixed
+- `python/compute_rho.py` and `python/newton_rho.py` - both had a
+  systematic bias (~10^-2) in their ratio-test estimate of rho_m, from
+  omitting the n^(-3/2) polynomial correction factor present in the
+  transfer theorem's asymptotic formula. Corrected; both now agree with
+  `critical_point.py` to 10^-4-10^-5, a ~250x reduction in error.
+
+### Notes
+- Every script in `python/` and `coq/` now corresponds to a claim that
+  appears, under the same theorem/table numbers, in the current preprint.
+- Three components of the monotonicity argument remain machine-checked in
+  Coq, unchanged from the previous release: this covers specific lemmas
+  (Lemma 4.6, the operator-monotonicity step of Theorem 4.4, and an
+  abstract involution-counting principle), not Theorem 4.7 in its
+  entirety.
 
 ## [1.1] - 2026-08-07
 
 ### Changed
-- `README.md` — added the Zenodo DOI of this repository (v1.0) to the
+- `README.md` - added the Zenodo DOI of this repository (v1.0) to the
   Citation section, replacing the placeholder.
-- `CHANGELOG.md` — this entry.
+- `CHANGELOG.md` - this entry.
 
 ## [1.0] - 2026-08-07
 
 ### Added
-- `coq/convexity_lemma.v` — Lemma 1 (§4), the analytic convexity lemma,
+- `coq/convexity_lemma.v` - Lemma 1 (§4), the analytic convexity lemma,
   proved via the mean value theorem.
-- `coq/operator_monotonicity.v` — Lemma 2 (§4) in full, including the true
+- `coq/operator_monotonicity.v` - Lemma 2 (§4) in full, including the true
   infinite series (Coquelicot), not merely its elementary building blocks.
-- `coq/involution_counting.v` — the abstract counting principle behind
+- `coq/involution_counting.v` - the abstract counting principle behind
   Theorem 2 (§5), generalized to any type with decidable equality and
-  instantiated concretely for *m* = 5.
-- `coq/coefficient_stabilization.v` — a finite-order computational
-  confirmation, for *m* = 5 truncated at degree 13, that the Picard
+  instantiated concretely for m = 5.
+- `coq/coefficient_stabilization.v` - a finite-order computational
+  confirmation, for m = 5 truncated at degree 13, that the Picard
   iteration defining the rooted series stabilizes.
-- `python/` — the exact-rational series solver adapted from the companion
+- `python/` - the exact-rational series solver adapted from the companion
   enumeration paper (see README for the full reference), the symbolic
-  (sympy) verification of the algebraic identities of §5–7, and the
-  derivation of an explicit lower bound on ρ₅.
-- `README.md` — overview, rationale, scope, requirements, references,
+  (sympy) verification of the algebraic identities of §5-7, and the
+  derivation of an explicit lower bound on rho_5.
+- `README.md` - overview, rationale, scope, requirements, references,
   citation placeholder.
 
 ### Notes
