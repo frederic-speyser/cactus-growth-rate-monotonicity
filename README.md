@@ -4,8 +4,8 @@ This repository accompanies the paper that proves the growth-rate monotonicity c
 
 A series of working papers accompanied the consolidation and preparation of this result. The working paper itself has since been consolidated into a single, self-contained work, and this repository has been updated to match it exactly: every script here verifies a claim that appears, under the same theorem/table numbers, in the current preprint, titled "Strict Monotonicity and a Lambert-W Asymptotic for Growth Rates of Non-Plane Strict m-Gonal Cacti."
 
- 
-See the **[companion page](docs/index.html)** for an overview of the results and a verification matrix linking each claim to the script that checks it (includes a summary in French).
+
+See the **[COMPANION PAGE](https://frederic-speyser.github.io/cactus-growth-rate-monotonicity/)** for an overview of the results and a verification matrix linking each claim to the script that checks it (includes a summary in French).
 
 Specifically, the paper proves:
 
