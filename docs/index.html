@@ -1,384 +1,622 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strict Monotonicity and a Lambert-W Asymptotic for Growth Rates of Non-Plane Strict m-Gonal Cacti</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-  :root {
-    --ink:#1a1a1a; --ink-soft:#4a4a4a; --paper:#fdfdfb; --rule:#d8d5cc;
-    --accent:#6b5940; --accent2:#8a6d4f; --ok:#2f6b3a; --ok-bg:#eef4ee;
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{geometry}
+\geometry{margin=2.55cm}
+\usepackage{booktabs}
+\usepackage[expansion=false]{microtype}
+\usepackage{setspace}
+\setstretch{1.13}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\KC}{\mathit{KC}}
+\newcommand{\SX}{\mathit{SX}}
+\newcommand{\SC}{\mathit{SC}}
+
+\title{Strict Monotonicity and a Lambert-$W$ Asymptotic for Growth\\ Rates of Non-Plane Strict $m$-Gonal Cacti}
+\author{Frédéric G. Speyser\thanks{Independent Researcher, Association Sciences \& Cooperation, France. \texttt{f.speyser@ik.me}}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A cactus is strict $m$-gonal if every block is a cycle of length \(m\ge 5\). Specialising the free split-decomposition template of Bahrani and Lumbroso to a single length \(m\), we determine the generating functions of vertex-rooted and unrooted non-plane objects and analyse their dominant singularity. For odd \(m\) the critical value is explicit; for even \(m\) the same one-term substitution is blocked. The rooted coefficients are of square-root type. We prove that the radius of convergence \(\rho_m\) is strictly increasing, that \(\rho_m\to 1\), and that
+\[
+1-\rho_m=\lambda_m-\tfrac12\lambda_m^2+O\bigl((\log m)/m^2\bigr),
+\]
+where \(\lambda_m=\bigl(\log((m-1)/2)+1+W(e^{-1})\bigr)/(m-1)\) and \(W\) is the Lambert function. Thus the exponential growth rate \(1/\rho_m\) decreases to \(1\) at rate \((\log m)/m\).
+\end{abstract}
+
+\noindent
+\textbf{Keywords.} Cactus graphs; split-decomposition; analytic combinatorics; singularity analysis; Lambert function.
+
+\noindent
+\textbf{Mathematics Subject Classification.} 05A15, 05A16, 05C30.
+
+\section{Introduction}
+A cactus graph is a connected graph in which every edge lies on at most one cycle. It is \emph{$m$-gonal} if every cyclic block has length \(m\), and \emph{strict} if it has no bridges. We enumerate free (non-plane) strict \(m\)-gonal cacti up to isomorphism, for fixed \(m\ge 5\). The distinction is combinatorial: two embeddings that differ by a cyclic reordering of blocks around a cut-vertex represent the same abstract graph.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.85, thick,
+  v/.style={circle, draw, fill=black, inner sep=1.35pt}]
+  \foreach \i in {0,...,4} {
+    \node[v] (A\i) at ({90+72*\i}:1.15) {};
   }
-  * { box-sizing: border-box; }
-  body {
-    font-family: 'Source Serif 4', Georgia, serif;
-    background: var(--paper); color: var(--ink);
-    max-width: 960px; margin: 0 auto; padding: 56px 32px 100px;
-    line-height: 1.6; font-size: 17px;
+  \draw (A0)--(A1)--(A2)--(A3)--(A4)--(A0);
+  \pgfmathsetmacro{\angAone}{90+72*1}
+  \pgfmathsetmacro{\angFromB}{\angAone+180}
+  \coordinate (centerB) at ({\angAone}:{1.15+1.05});
+  \foreach \i in {1,...,4} {
+    \pgfmathsetmacro{\ang}{\angFromB+72*\i}
+    \node[v] (B\i) at ($(centerB) + (\ang:1.05)$) {};
   }
-  h1 { font-size: 27px; font-weight: 700; line-height: 1.3; margin: 0 0 8px; }
-  .subtitle { color: var(--ink-soft); font-size: 15.5px; margin-bottom: 26px; font-style: italic; }
-  .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
-  .badge { font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 5px 12px;
-           border: 1px solid var(--rule); border-radius: 5px; text-decoration: none; color: var(--accent);
-           background: #fff; }
-  .badge:hover { border-color: var(--accent); }
-  h2 { font-size: 20px; font-weight: 700; margin: 44px 0 14px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
-  .result-card { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 22px 26px; margin: 14px 0; }
-  .result-name { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; text-transform: uppercase;
-                 letter-spacing: .04em; color: var(--accent2); margin-bottom: 8px; }
-  .result-formula { font-size: 18px; text-align: center; margin: 14px 0; overflow-x: auto; }
-  .result-desc { font-size: 15px; color: var(--ink-soft); margin-top: 8px; }
-  table.matrix { width: 100%; border-collapse: collapse; font-size: 14px; margin: 18px 0; }
-  table.matrix th, table.matrix td { border: 1px solid var(--rule); padding: 10px 8px; text-align: center; }
-  table.matrix th { background: #f4f2ec; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-                     text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
-  table.matrix td:first-child, table.matrix th:first-child { text-align: left; font-family: 'Source Serif 4'; font-size: 14.5px; }
-  .check { color: var(--ok); font-weight: 700; font-size: 16px; }
-  .dash { color: #ccc; }
-  .method-file { display: block; font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--ink-soft); margin-top: 2px; }
-  .chart-wrap { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 20px; margin: 18px 0; }
-  .legend { display: flex; gap: 22px; justify-content: center; margin-top: 10px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; }
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  .swatch { width: 18px; height: 3px; display: inline-block; }
-  .file-list { list-style: none; padding: 0; margin: 14px 0; }
-  .file-list li { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 16px; margin: 6px 0;
-                   display: flex; justify-content: space-between; align-items: center; font-size: 14.5px; }
-  .file-list code { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent2); }
-  .file-tag { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase;
-              background: var(--ok-bg); color: var(--ok); padding: 3px 8px; border-radius: 4px; }
-  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13.5px; color: var(--ink-soft); }
-  footer a { color: var(--accent); }
-  a { color: var(--accent2); }
-  .tabbar { display: flex; gap: 4px; margin: 30px 0 0; border-bottom: 2px solid var(--rule); }
-  .tabbtn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 10px 20px; cursor: pointer;
-            background: none; border: none; border-bottom: 3px solid transparent; color: var(--ink-soft); }
-  .tabbtn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-  .tabpanel { display: none; }
-  .tabpanel.active { display: block; }
-  .analogy-box { background: var(--ok-bg); border-left: 3px solid var(--ok); border-radius: 6px; padding: 16px 20px; margin: 16px 0; font-size: 15px; }
-  table.oeis { width: 100%; border-collapse: collapse; font-size: 14px; margin: 14px 0; }
-  table.oeis th, table.oeis td { border: 1px solid var(--rule); padding: 9px 10px; text-align: left; }
-  table.oeis th { background: #f4f2ec; font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; }
-  table.oeis a { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
-</style>
-</head>
-<body>
+  \draw (A1)--(B1)--(B2)--(B3)--(B4)--(A1);
+  \pgfmathsetmacro{\angAthree}{90+72*3}
+  \pgfmathsetmacro{\angFromC}{\angAthree+180}
+  \coordinate (centerC) at ({\angAthree}:{1.15+1.05});
+  \foreach \i in {1,...,4} {
+    \pgfmathsetmacro{\ang}{\angFromC+72*\i}
+    \node[v] (C\i) at ($(centerC) + (\ang:1.05)$) {};
+  }
+  \draw (A3)--(C1)--(C2)--(C3)--(C4)--(A3);
+\end{tikzpicture}
+\caption{A strict \(5\)-gonal cactus with three blocks: every block is a \(5\)-cycle, consecutive blocks share exactly one vertex, and there are no bridges. The graph has \(n=1+4\cdot 3=13\) vertices.}
+\label{fig:cactus}
+\end{figure}
 
-<h1>Strict Monotonicity and a Lambert-W Asymptotic for Growth Rates of Non-Plane Strict m-Gonal Cacti</h1>
-<p class="subtitle">Frédéric G. Speyser - companion page to the preprint and its verification suite (v2.0)</p>
+Plane \(m\)-gonal cacti were enumerated by Bóna, Bousquet, Labelle and Leroux~\cite{Bona2000}. Bahrani and Lumbroso~\cite{Bahrani2018EJC,Bahrani2018ANALCO}, building on Cunningham~\cite{Cunningham1982} and Gioan--Paul~\cite{GioanPaul2012}, gave a split-decomposition grammar for cacti with an arbitrary set \(\Omega\) of admissible cycle lengths, in both the plane and the free setting. The case \(\Omega=\{m\}\) with \(m\ge 5\) is already included, and excludes bridges. That template does not solve the equations, locate the singularity, or compare growth rates in \(m\).
 
-<div class="badges">
-  <a class="badge" href="https://doi.org/10.5281/zenodo.22206801">preprint DOI: 10.5281/zenodo.22206801</a>
-  <a class="badge" href="https://doi.org/10.5281/zenodo.21840266">code DOI: 10.5281/zenodo.21840266</a>
-  <a class="badge" href="https://github.com/frederic-speyser/non-plane-mgonal-cacti">companion enumeration repo</a>
-</div>
+The present paper carries out that analysis. After recalling the grammar (Section~\ref{sec:grammar}), we establish a parity dichotomy for the critical value \(\tau_m=s_m(\rho_m)\) -- explicit, \(\tau_m=(2/(m-1))^{1/(m-1)}\), when \(m\) is odd, and blocked by a secondary evaluation \(s_m(\rho_m^2)\) when \(m\) is even -- together with the square-root transfer \(s_{m,n}\sim C_m\rho_m^{-n}n^{-3/2}\) in both parities (Section~\ref{sec:sing}). We then prove that \(\rho_m\) is strictly increasing (Section~\ref{sec:mono}) and determine the large-\(m\) equivalent of \(1-\rho_m\) (Section~\ref{sec:limit}). Coefficients for \(m=5,6,7,8\) coincide with columns of the OEIS arrays A332648 and A332649; the contribution is the analysis, not the existence of the numbers.
 
-<div class="tabbar">
-  <button class="tabbtn active" onclick="showTab('en')">English</button>
-  <button class="tabbtn" onclick="showTab('fr')">Pour les curieux (résumé en français)</button>
-</div>
+\section{Grammar}
+\label{sec:grammar}
+Let \(s_m(x)\) be the ordinary generating function of vertex-rooted strict \(m\)-gonal cacti, with \(x\) marking vertices. A cactus with \(k\) blocks has \(n=1+(m-1)k\) vertices (Figure~\ref{fig:cactus}), so \(s_m\) is supported on \(n\equiv 1\pmod{m-1}\). For \(m\ge 5\) the cycle \(C_m\) is prime~\cite[Lemma~1]{Bahrani2018ANALCO}. The reduced split-decomposition tree then has only star-nodes and prime nodes labelled \(C_m\), with the adjacency rules of~\cite[Theorem~2]{Bahrani2018ANALCO} specialised to \(\Omega=\{m\}\) (no bridges). The local constraints are summarised in Figure~\ref{fig:adj}.
 
-<div id="tab-en" class="tabpanel active">
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[thick, font=\small,
+  leaf/.style={circle, draw, fill=black, inner sep=1.2pt},
+  box/.style={draw, rounded corners=1pt, inner sep=3pt, font=\scriptsize}]
+  \begin{scope}[local bounding box=ok1]
+    \node[box] (S1) at (0,0.55) {star};
+    \node[leaf, label=below:leaf] (L1) at (0,-0.55) {};
+    \node[font=\scriptsize] at (0,1.05) {centre};
+    \draw (S1)--(L1);
+    \node[font=\scriptsize\bfseries] at (0,-1.15) {allowed};
+  \end{scope}
+  \begin{scope}[shift={(3.3,0)}, local bounding box=ok2]
+    \node[box] (S2) at (-0.7,0.35) {star};
+    \node[box] (P2) at (0.7,0.35) {$C_m$};
+    \node[font=\scriptsize] at (0,0.85) {extremity};
+    \draw (S2)--(P2);
+    \node[font=\scriptsize\bfseries] at (0,-1.15) {allowed};
+  \end{scope}
+  \begin{scope}[shift={(6.6,0)}, local bounding box=no1]
+    \node[box] (P3a) at (-0.65,0.35) {$C_m$};
+    \node[box] (P3b) at (0.65,0.35) {$C_m$};
+    \draw[dashed] (P3a)--(P3b);
+    \node[font=\scriptsize\bfseries] at (0,-1.15) {forbidden};
+  \end{scope}
+  \begin{scope}[shift={(9.9,0)}, local bounding box=no2]
+    \node[box] (S4a) at (-0.7,0.35) {star};
+    \node[box] (S4b) at (0.7,0.35) {star};
+    \node[font=\scriptsize] at (0,0.85) {extremities};
+    \draw[dashed] (S4a)--(S4b);
+    \node[font=\scriptsize\bfseries] at (0,-1.15) {forbidden};
+  \end{scope}
+\end{tikzpicture}
+\caption{Adjacencies in the reduced split-decomposition tree of a strict \(m\)-gonal cactus. A star-centre is always attached to a leaf; a star-extremity is always attached to a \(C_m\)-marker. A \(C_m\)--\(C_m\) edge and an extremity--extremity edge are excluded: the former is incompatible with the reduced tree, the latter would encode a bridge.}
+\label{fig:adj}
+\end{figure}
 
-<h2>Context and contribution</h2>
-<p>A cactus graph is a connected graph in which every edge lies on at most one cycle. It is <em>m</em>-gonal if every cyclic block has length <em>m</em>, and <em>strict</em> if it has no bridges. Bahrani and Lumbroso (2018) gave a split-decomposition template for this class, for an arbitrary set of admissible cycle lengths, in both the plane and the free setting. That template does not solve the equations, locate the singularity, or compare growth rates across <em>m</em>.</p>
+Write \(s_m(x)=x+\SX(x)\), where
+\begin{equation}
+\label{eq:SX}
+\SX(x)=x\Bigl(\exp\Bigl(\sum_{i\ge 1}\frac{\KC(x^i)}{i}\Bigr)-1\Bigr).
+\end{equation}
+Equivalently, \(s_m(x)=x\exp\bigl(\sum_{i\ge 1}\KC(x^i)/i\bigr)\). The kernel \(\KC\) is the undirected sequence \(\mathrm{USEQ}_{m-1}(s_m)\)~\cite[Ch.~4]{BergeronLabelleLeroux1998}:
+\begin{equation}
+\label{eq:KC}
+\begin{aligned}
+m\text{ odd:}&\qquad
+\KC(x)=\tfrac12\bigl(s_m(x)^{m-1}+s_m(x^2)^{(m-1)/2}\bigr),\\
+m\text{ even:}&\qquad
+\KC(x)=\tfrac12\bigl(s_m(x)^{m-1}+s_m(x)\,s_m(x^2)^{(m-2)/2}\bigr).
+\end{aligned}
+\end{equation}
+The unrooted series is given by the dissymmetry theorem
+\[
+G_m(x)=T_{C_m}(x)+T_S(x)-T_{S\text{--}C_m}(x),
+\]
+with \(T_S=x\cdot\SC\), \(T_{S\text{--}C_m}=\KC\cdot\SX\), \(\SC=\exp(\sum\KC(x^i)/i)-1-\KC\), and \(T_{C_m}\) the dihedral cycle index \(Z_{D_m}\) evaluated at \(p_i=s_m(x^i)\). In particular \(G_m\) is a polynomial combination of the series \(s_m(x^i)\), hence has the same radius of convergence as \(s_m\).
 
-<div class="chart-wrap" style="text-align:center;">
-<svg viewBox="0 0 290 230" xmlns="http://www.w3.org/2000/svg" style="width:260px; height:auto;">
-  <g stroke="#1a1a1a" stroke-width="2" fill="none">
-    <polygon points="160.0,48.0 120.1,77.0 135.3,124.0 184.7,124.0 199.9,77.0" />
-    <polygon points="120.1,77.0 104.8,30.1 55.4,30.1 40.2,77.0 80.1,106.0" />
-    <polygon points="184.7,124.0 169.4,170.9 209.4,200.0 249.3,170.9 234.1,124.0" />
-  </g>
-  <g fill="#1a1a1a">
-    <circle cx="160.0" cy="48.0" r="3.4"/><circle cx="120.1" cy="77.0" r="3.4"/><circle cx="135.3" cy="124.0" r="3.4"/><circle cx="184.7" cy="124.0" r="3.4"/><circle cx="199.9" cy="77.0" r="3.4"/>
-    <circle cx="104.8" cy="30.1" r="3.4"/><circle cx="55.4" cy="30.1" r="3.4"/><circle cx="40.2" cy="77.0" r="3.4"/><circle cx="80.1" cy="106.0" r="3.4"/>
-    <circle cx="169.4" cy="170.9" r="3.4"/><circle cx="209.4" cy="200.0" r="3.4"/><circle cx="249.3" cy="170.9" r="3.4"/><circle cx="234.1" cy="124.0" r="3.4"/>
-  </g>
-</svg>
-<p style="font-size:13.5px; color:var(--ink-soft); max-width:480px; margin:8px auto 0;">Figure 1 of the preprint: a strict 5-gonal cactus with three blocks - every block a 5-cycle, consecutive blocks sharing exactly one vertex, no bridges. n = 1 + 4·3 = 13 vertices.</p>
-</div>
+Leading coefficients, obtained by expanding~\eqref{eq:SX}--\eqref{eq:KC} and independently reconstructed by block-tree generation with isomorphism clustering, are recorded in Tables~\ref{tab:rooted}--\ref{tab:unrooted}.
 
-<p>This paper treats the free case with a single length m ≥ 5: generating functions, dominant singularity (closed form for the critical value when m is odd; a structural obstruction to the same substitution when m is even), strict increase of the radius of convergence ρ<sub>m</sub>, and the two-term equivalent</p>
-<div class="result-formula">1 − ρ<sub>m</sub> = λ<sub>m</sub> − ½λ<sub>m</sub>² + O((log m)/m²)</div>
-<p>with λ<sub>m</sub> built from the Lambert function W(e⁻¹). Both the monotonicity and the large-m law require the fixed-m analysis; they do not follow from the template alone.</p>
+\begin{table}[ht]
+\centering
+\caption{Vertex-rooted series \(s_m(x)\).}
+\label{tab:rooted}
+\begin{tabular}{cl}
+\toprule
+\(m\) & leading terms of \(s_m(x)\) \\
+\midrule
+\(5\) & \(x+x^5+3x^9+13x^{13}+62x^{17}+333x^{21}\) \\
+\(6\) & \(x+x^6+4x^{11}+22x^{16}+140x^{21}+985x^{26}\) \\
+\(7\) & \(x+x^7+4x^{13}+25x^{19}+176x^{25}+1397x^{31}\) \\
+\(8\) & \(x+x^8+5x^{15}+37x^{22}+319x^{29}+3059x^{36}\) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-<h2>Supporting results</h2>
-<p style="color:var(--ink-soft); font-size:15px;">The two theorems below rest on a short chain of intermediate steps, each independently verified in this repository (see the matrix below).</p>
-<table class="matrix" style="margin-top:8px;">
-<tr><th style="text-align:left; width:60%;">Result</th><th>Number in the PDF</th></tr>
-<tr><td style="text-align:left;">Square-root transfer for the rooted coefficients (n⁻³/²), after reduction to an aperiodic series</td><td>Theorem 3.3</td></tr>
-<tr><td style="text-align:left;">Each Picard iterate for m+1 is termwise dominated by the corresponding iterate for m</td><td>Theorem 4.4</td></tr>
-<tr><td style="text-align:left;">Strict convexity of the defining operator in its second argument, upgrading the iterate comparison to ρ<sub>m</sub> &lt; ρ<sub>m+1</sub></td><td>Lemma 4.6</td></tr>
-<tr><td style="text-align:left;">Strict increase of the radius of convergence, ρ<sub>m</sub> &lt; ρ<sub>m+1</sub></td><td>Theorem 4.7</td></tr>
-<tr><td style="text-align:left;">Two-term Lambert-W equivalent for 1 − ρ<sub>m</sub></td><td>Theorem 5.3</td></tr>
-</table>
+\begin{table}[ht]
+\centering
+\caption{Unrooted series \(G_m(x)\).}
+\label{tab:unrooted}
+\begin{tabular}{cl}
+\toprule
+\(m\) & leading terms of \(G_m(x)\) \\
+\midrule
+\(5\) & \(x^5+x^9+3x^{13}+8x^{17}+31x^{21}\) \\
+\(6\) & \(x^6+x^{11}+4x^{16}+13x^{21}+67x^{26}\) \\
+\(7\) & \(x^7+x^{13}+4x^{19}+14x^{25}+80x^{31}\) \\
+\(8\) & \(x^8+x^{15}+5x^{22}+20x^{29}+143x^{36}\) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-<h2>The two central results</h2>
+\section{Singularity analysis}
+\label{sec:sing}
+Write \(s=s_m\) and
+\begin{equation}
+\label{eq:Phi}
+s=\Phi_m(x,s):=x\exp\bigl(\KC(x,s)+h_m(x)\bigr),
+\end{equation}
+where \(\KC(x,s)\) isolates the dependence on \(s(x)\) in~\eqref{eq:KC} and \(h_m(x)=\sum_{i\ge 2}\KC(x^i)/i\). For \(|x|<\rho_m\) every \(s(x^i)\) with \(i\ge 2\) is analytic. The pair \((\rho_m,\tau_m)\) is the unique small positive solution of
+\begin{equation}
+\label{eq:crit}
+\Phi_m(\rho,\tau)=\tau,\qquad \partial_y\Phi_m(\rho,\tau)=1.
+\end{equation}
+Nonnegative coefficients imply that \(s(x)/x\) is increasing on \([0,\rho_m]\).
 
-<div class="result-card">
-  <div class="result-name">Theorem 4.7 - Strict monotonicity</div>
-  <div class="result-formula">ρ<sub>m</sub> &lt; ρ<sub>m+1</sub> for every m ≥ 5</div>
-  <div class="result-desc">The radius of convergence of the rooted enumeration series is strictly increasing in m - equivalently, the exponential growth rate 1/ρ<sub>m</sub> is strictly decreasing. Proved by combining a combinatorial lower bound, a non-circular monotonicity result on Picard iterates, and a convexity-based differential criterion.</div>
-</div>
+\begin{theorem}
+\label{thm:tau-odd}
+If \(m\ge 5\) is odd, then \(\tau_m=\bigl(2/(m-1)\bigr)^{1/(m-1)}\).
+\end{theorem}
 
-<div class="result-card">
-  <div class="result-name">Theorem 5.3 - Lambert-W asymptotic</div>
-  <div class="result-formula">1 − ρ<sub>m</sub> = λ<sub>m</sub> − ½λ<sub>m</sub>² + O((log m)/m²)</div>
-  <div class="result-desc">where λ<sub>m</sub> = (log((m−1)/2) + 1 + W(e⁻¹)) / (m−1) and W is the Lambert function. As m → ∞, the growth rate decreases to 1 at rate (log m)/m - the two-term expansion of Theorem 5.3.</div>
-</div>
+\begin{proof}
+For \(m\) odd, \(\KC(x,y)=\frac12 y^{m-1}+g(x)\). Then \(\partial_y\Phi_m=x\,e^{\KC+h}\cdot\frac{m-1}{2}y^{m-2}\). At the critical point \(x\,e^{\KC+h}=\tau\), hence \(\frac{m-1}{2}\tau^{m-1}=1\).
+\end{proof}
 
-<h2>Verification matrix</h2>
-<p style="color:var(--ink-soft); font-size:15px;">Every claim below is checked by at least one method genuinely independent of its own derivation in the paper - different language, different arithmetic, or a different route entirely.</p>
+\begin{proposition}
+\label{prop:obstruction}
+If \(m\) is even, the same substitution yields
+\[
+A(\rho)\,\tau+\tfrac{m-1}{2}\tau^{m-1}=1,\qquad A(\rho)=\tfrac12 s(\rho^2)^{(m-2)/2},
+\]
+and \(A(\rho)\) is not a function of the pair \((\rho,\tau)\) alone.
+\end{proposition}
 
-<table class="matrix">
-<tr>
-  <th>Result</th>
-  <th>Python<br>(numerical)</th>
-  <th>Python<br>(SymPy)</th>
-  <th>PARI/GP</th>
-  <th>Coq</th>
-</tr>
-<tr>
-  <td>Critical data ρ<sub>m</sub>, τ<sub>m</sub> (Table 3)</td>
-  <td><span class="check">✓</span><span class="method-file">critical_point.py, compute_rho.py, newton_rho.py</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">verify_critical_pari.gp</span></td>
-  <td><span class="dash">-</span></td>
-</tr>
-<tr>
-  <td>Φ<sub>y</sub>, Φ<sub>hh</sub> (Theorem 3.3)</td>
-  <td><span class="check">✓</span><span class="method-file">verify_transfer_constants.py</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-</tr>
-<tr>
-  <td>Convexity (Lemma 4.6)</td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">convexity_lemma.v</span></td>
-</tr>
-<tr>
-  <td>Operator monotonicity (Theorem 4.4)</td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">operator_monotonicity.v</span></td>
-</tr>
-<tr>
-  <td>Chain-cactus counting principle</td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">involution_counting.v</span></td>
-</tr>
-<tr>
-  <td>Coefficient stabilization (m=5)</td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">coefficient_stabilization.v</span></td>
-</tr>
-<tr>
-  <td>Lambert-W identity chain (Theorem 5.3)</td>
-  <td><span class="dash">-</span></td>
-  <td><span class="check">✓</span><span class="method-file">verify_theorem_equiv_symbolic.py</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-</tr>
-<tr>
-  <td>Extended range m = 15…30 (Theorem 5.3)</td>
-  <td><span class="check">✓</span><span class="method-file">extended_range_m30.py</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-  <td><span class="dash">-</span></td>
-</tr>
-</table>
+\begin{proof}
+For \(m\) even, \(\KC(x,y)=\frac12 y^{m-1}+A(x)y\), so \(\partial_y\KC=\frac{m-1}{2}y^{m-2}+A(x)\). Substituting \(x\,e^{\KC+h}=\tau\) produces the displayed relation. The value \(s(\rho^2)\) is not determined by~\eqref{eq:crit}.
+\end{proof}
 
-<p style="font-size:14px; color:var(--ink-soft);">Theorem 4.7 (strict monotonicity) itself is proved on paper, independently of any code; the Coq entries above verify specific lemmas underlying that proof, not the full inductive argument in its entirety.</p>
+Thus a one-term closed form for \(\tau_m\) is available if and only if the reflection count in~\eqref{eq:KC} produces no linear term in \(y\), i.e.\ if and only if \(m\) is odd. This is an obstruction to that substitution, not a proof that no expression of another kind exists.
 
-<h2>Growth rate μ<sub>m</sub> = 1/ρ<sub>m</sub>, m = 5…30</h2>
-<div class="chart-wrap">
-<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
-  <!-- axes -->
-  <line x1="70" y1="330" x2="690" y2="330" stroke="#333" stroke-width="1.2"/>
-  <line x1="70" y1="330" x2="70" y2="30" stroke="#333" stroke-width="1.2"/>
-  <text x="695" y="335" font-family="IBM Plex Mono" font-size="12" fill="#333">m</text>
-  <text x="45" y="28" font-family="IBM Plex Mono" font-size="12" fill="#333">μ_m</text>
+The series \(s_m(x)=x\,h(x^{m-1})\) reduces the arithmetic support to an aperiodic series \(h(y)\): indeed \(h(y)=1+y+O(y^2)\) for every \(m\ge 5\). The exponential schema~\cite[§VIII.4]{FlajoletSedgewick2009} applies to \(h\).
 
-  <!-- x ticks: m=5..30 mapped to x=70..690, y for mu in [1.0,1.7] mapped to y=330..30 -->
-  <!-- scale: x = 70 + (m-5)*(620/25); y = 330 - (mu-1.0)*(300/0.7) -->
+\begin{theorem}
+\label{thm:asymp}
+As \(n\to\infty\) along \(n\equiv 1\pmod{m-1}\),
+\[
+s_{m,n}\sim C_m\,\rho_m^{-n}\,n^{-3/2}.
+\]
+If \(m\) is odd, \(\Phi_{hh}=(m-1)\rho_m/\tau_m\) at the critical point of \(h\), and \(C_m\) is explicit in \(\rho_m,\tau_m\) up to the single numerical factor \(\Phi_y\). If \(m\) is even, every factor in \(C_m\) is numerical.
+\end{theorem}
 
-  <g font-family="IBM Plex Mono" font-size="11" fill="#555">
-    <text x="65" y="345">5</text>
-    <text x="188" y="345">10</text>
-    <text x="312" y="345">15</text>
-    <text x="436" y="345">20</text>
-    <text x="560" y="345">25</text>
-    <text x="684" y="345">30</text>
-    <text x="40" y="334">1.0</text>
-    <text x="40" y="248">1.2</text>
-    <text x="40" y="162">1.4</text>
-    <text x="40" y="76">1.6</text>
-  </g>
-  <line x1="70" y1="330" x2="690" y2="330" stroke="#bbb" stroke-width="1" stroke-dasharray="2,3"/>
+\begin{proof}
+Since \(s_m\) is supported only on \(n\equiv 1\pmod{m-1}\), it has \(m-1\) singularities of equal modulus on \(|x|=\rho_m\), and the single-singularity transfer theorem does not apply to \(s_m\) directly. Write \(y=x^{m-1}\) and \(s_m(x)=x\,h(y)\); the identity \(s_m(x^2)=x^2h(x^{2(m-1)})=x^2h(y^2)\) eliminates every fractional power of \(y\) from \(\KC\), for any \(m\): writing \(\KC(x^i)=y^i\kappa(y^i)\) for a well-defined \(\kappa\), one has
+\[
+h(y)=\exp\Bigl(\sum_{i\ge 1}\frac{y^i\kappa(y^i)}{i}\Bigr),
+\]
+a power series in \(y\) alone.
 
-  <!-- solid: computed mu_m -->
-  <polyline fill="none" stroke="#6b5940" stroke-width="2.2" points="
-    70.0,49.9 94.8,81.8 119.6,118.8 144.4,137.7 169.2,159.1 194.0,171.5 218.8,185.6 243.6,194.4
-    318.0,218.6 392.4,233.7 442.0,241.9 491.6,248.6 566.0,257.1 640.4,263.4 690.0,267.2" />
-  <!-- dashed: two-term approximation -->
-  <polyline fill="none" stroke="#8a6d4f" stroke-width="1.8" stroke-dasharray="6,4" points="
-    70.0,170.8 94.8,183.2 119.6,193.8 144.4,203.1 169.2,211.0 194.0,218.0 218.8,224.1 243.6,229.5
-    318.0,242.7 392.4,252.5 442.0,257.8 491.6,262.3 566.0,268.1 640.4,272.8 690.0,275.6" />
+\emph{Aperiodicity.} At lowest order, \(h(y)=\exp(y\kappa(0)+O(y^2))\), and \(\kappa(0)=\tfrac12[h(0)^{m-1}+h(0)^{(m-1)/2}]=1\) for every \(m\), since \(h(0)=1\). Hence \(h(y)=1+y+O(y^2)\): the coefficients of \(y^0\) and \(y^1\) are both exactly \(1\), for every \(m\ge5\). Two consecutive non-zero indices preclude any periodicity of the support (a period \(d>1\) would force every gap to be a multiple of \(d\), impossible with a gap of \(1\)). This holds structurally, independently of \(m\).
 
-  <g fill="#6b5940">
-    <circle cx="70.0" cy="49.9" r="3.2"/><circle cx="94.8" cy="81.8" r="3.2"/><circle cx="119.6" cy="118.8" r="3.2"/>
-    <circle cx="144.4" cy="137.7" r="3.2"/><circle cx="169.2" cy="159.1" r="3.2"/><circle cx="194.0" cy="171.5" r="3.2"/>
-    <circle cx="218.8" cy="185.6" r="3.2"/><circle cx="243.6" cy="194.4" r="3.2"/><circle cx="318.0" cy="218.6" r="3.2"/>
-    <circle cx="392.4" cy="233.7" r="3.2"/><circle cx="442.0" cy="241.9" r="3.2"/><circle cx="491.6" cy="248.6" r="3.2"/>
-    <circle cx="566.0" cy="257.1" r="3.2"/><circle cx="640.4" cy="263.4" r="3.2"/><circle cx="690.0" cy="267.2" r="3.2"/>
-  </g>
-</svg>
-<div class="legend">
-  <span class="legend-item"><span class="swatch" style="background:#6b5940;"></span> computed μ<sub>m</sub></span>
-  <span class="legend-item"><span class="swatch" style="background:#8a6d4f; border-top:2px dashed #8a6d4f; height:0;"></span> 1 + λ<sub>m</sub> − ½λ<sub>m</sub>²</span>
-</div>
-</div>
-<p style="font-size:14px; color:var(--ink-soft);">Reproduces Figure 3 of the preprint. The gap between the two curves, rescaled by m²/log(m), stays within [4.4, 5.2] across the whole range - see <code>extended_range_m30.py</code>.</p>
+\emph{Transfer.} The exp-schema transfer theorem~\cite[§VIII.4]{FlajoletSedgewick2009} therefore applies to \(h\) directly: writing \(y_c=\rho_m^{m-1}\) for its radius of convergence and \(h_c=h(y_c)=\tau_m/\rho_m\) for the critical value, one has \(h_k\sim(\gamma_m/(2\sqrt\pi))\,y_c^{-k}k^{-3/2}\), with \(\gamma_m=\sqrt{2y_c\Phi_y/\Phi_{hh}}\) evaluated at \((y_c,h_c)\) for \(\Phi(y,h)=\exp(G(y,h))\), \(G(y,h)=\sum_i y^i\kappa(y^i)/i\).
 
-<h2>Repository layout</h2>
-<ul class="file-list">
-  <li><code>paper/speyser-mgonal-cacti-monotonicity.{tex,pdf}</code> <span class="file-tag">preprint</span></li>
-  <li><code>python/critical_point.py</code> <span class="file-tag">reference method</span></li>
-  <li><code>python/compute_rho.py</code>, <code>newton_rho.py</code> <span class="file-tag">ratio tests</span></li>
-  <li><code>python/verify_transfer_constants.py</code> <span class="file-tag">finite differences</span></li>
-  <li><code>python/extended_range_m30.py</code> <span class="file-tag">m up to 30</span></li>
-  <li><code>python/verify_theorem_equiv_symbolic.py</code> <span class="file-tag">SymPy</span></li>
-  <li><code>pari/verify_critical_pari.gp</code> <span class="file-tag">PARI/GP</span></li>
-  <li><code>coq/*.v</code> - 4 files <span class="file-tag">machine-checked</span></li>
-</ul>
+\emph{The case \(m\) odd.} In the implicit-function schema, the \(h\)-dependence of \(G(y,h)\) resides entirely in its \(i=1\) term: the terms \(i\ge2\) involve \(h(y^i)\) at strictly smaller arguments and are analytic known functions of \(y\) alone at the critical point. From~\eqref{eq:KC} (\(m\) odd), that \(i=1\) term is \(y\cdot\tfrac12h^{m-1}\) plus \(h\)-independent tail contributions, so \(G_h=\tfrac12(m-1)y\,h^{m-2}\) and \(G_{hh}=\tfrac12(m-1)(m-2)y\,h^{m-3}=\bigl((m-2)/h\bigr)G_h\), identically. The criticality condition \(\Phi_h=1\), with \(\Phi(y_c,h_c)=h_c\), reads \(h_c\,G_h(y_c,h_c)=1\), i.e.\ \(G_h(y_c,h_c)=1/h_c\). Hence \(G_{hh}(y_c,h_c)=(m-2)/h_c^2\), and since \(\Phi_{hh}=\Phi\cdot(G_h^2+G_{hh})\):
+\[
+\Phi_{hh}(y_c,h_c)=1/h_c+h_c\,G_{hh}=(m-1)/h_c=(m-1)\rho_m/\tau_m,
+\]
+a closed form. By contrast \(\Phi_y(y_c,h_c)\) depends on the tail terms and has no known closed form; it is evaluated numerically for each \(m\).
 
-<h2>OEIS sequences</h2>
-<p style="font-size:14.5px; color:var(--ink-soft);">m=8, unrooted: no standalone entry needed - already exactly column k=8 of <a href="https://oeis.org/A332649">A332649</a>, which cites this paper directly; independently verified here by two unrelated methods (<code>verify_pari_dissymmetry_even_m.gp</code>, <code>exhaustive_iso_m8.py</code>).</p>
-<table class="oeis">
-<tr><th>m</th><th>rooted (vertex-rooted)</th><th>unrooted (free)</th></tr>
-<tr><td>5</td><td><a href="https://oeis.org/A398033">A398033</a></td><td><a href="https://oeis.org/A397250">A397250</a></td></tr>
-<tr><td>6</td><td><a href="https://oeis.org/A398034">A398034</a></td><td><a href="https://oeis.org/A398035">A398035</a></td></tr>
-<tr><td>7</td><td><a href="https://oeis.org/A397210">A397210</a></td><td><a href="https://oeis.org/A398575">A398575</a></td></tr>
-<tr><td>8</td><td><a href="https://oeis.org/A397546">A397546</a></td><td>- (see note above)</td></tr>
-</table>
+\emph{The case \(m\) even.} The reduction above and the aperiodicity argument used no parity assumption, so the same transfer applies to \(h\) verbatim. However \(G_{hh}\) no longer reduces to \((m-2)/h_c^2\) alone: substituting \(s_m(x)=x\,h(y)\) into the even branch of~\eqref{eq:KC} gives, for the \(i=1\) term,
+\[
+G_1(y,h)=y\cdot\tfrac12\bigl[h^{m-1}+h\cdot h(y^2)^{(m-2)/2}\bigr],
+\]
+an extra term linear in \(h\), with coefficient \(B(y)=\tfrac12h(y^2)^{(m-2)/2}\) a known analytic function of \(y\) alone at the critical point. This extra term vanishes under a second derivative, so \(G_{hh}(y_c,h_c)=\tfrac12(m-1)(m-2)y_ch_c^{m-3}\) still holds as a formula in \(y_c,h_c\) alone -- but it does \emph{not} vanish in \(G_h\). The criticality relation \(h_c\,G_h(y_c,h_c)=1\) now reads \(h_c[\tfrac12(m-1)y_ch_c^{m-2}+y_cB(y_c)]=1\), so
+\[
+\Phi_{hh}(y_c,h_c)=(m-1)/h_c-(m-2)\,y_c\,B(y_c),
+\]
+rather than the closed sub-formula of the odd case: the linear term is structurally absent for \(m\) odd (the sole exponent \(m-1\) is odd there), and does not disappear for \(m\) even. Both \(\Phi_y\) and this correction term are evaluated numerically.
 
-</div>
+\emph{Conclusion.} Translating \(h_k\sim(\gamma_m/(2\sqrt\pi))y_c^{-k}k^{-3/2}\) back via \(n=1+(m-1)k\) gives \(C_m=(\gamma_m/(2\sqrt\pi))\rho_m(m-1)^{3/2}\), with \(\gamma_m=\sqrt{2y_c\Phi_y/\Phi_{hh}}\) computed as above -- in closed form up to the single numerical factor \(\Phi_y\) for \(m\) odd, and entirely numerical for \(m\) even.
+\end{proof}
 
-<div id="tab-fr" class="tabpanel">
-<h2>Ce qu'étudie ce travail</h2>
-<p>Un cactus est un graphe dans lequel chaque arête appartient à au plus un cycle. Un cycle est simplement une boucle fermée : on part d'un sommet, on suit des arêtes et l'on revient à son point de départ sans parcourir deux fois la même arête. On peut se représenter cette structure comme un lacet que l'on referme sur lui-même.</p>
-<p>Dans un cactus, les différentes boucles peuvent se rencontrer, mais seulement en un sommet. Elles ne partagent jamais toute une arête. On peut donc imaginer des polygones assemblés les uns aux autres par certains de leurs sommets, sans jamais être collés côte à côte.</p>
-<p>Le dessin présenté plus haut n'est qu'un exemple, constitué de trois pentagones. Le travail ne porte toutefois pas sur cette seule configuration. Il concerne l'ensemble des cactus m-gonaux stricts, c'est-à-dire les cactus dont chaque bloc est un polygone ayant exactement m côtés. Cette définition vaut pour tout entier m supérieur ou égal à 5 : on peut donc considérer des pentagones, des hexagones, des heptagones, des polygones à trente côtés, et bien au-delà.</p>
-<p>Dès que le nombre de blocs augmente, le nombre de structures possibles devient considérable. Avec seulement cinq pentagones, soit vingt et un sommets, il ne s'agit déjà plus de quelques dessins isolés. Le squelette du cactus est alors un arbre composé de cinq pièces, qui peut prendre la forme d'une chaîne, d'une étoile, d'une structure en Y, ou d'autres configurations encore. Pour chaque pièce, il faut ensuite choisir le sommet par lequel elle est reliée aux autres, puis identifier les assemblages qui donnent en réalité le même graphe, simplement représenté différemment.</p>
-<p>Dans le cas des cactus enracinés, c'est-à-dire lorsqu'un sommet est marqué, on obtient ainsi 333 objets distincts. Sans sommet marqué, autrement dit pour les cactus libres, il n'en reste que 31. Cette différence importante ne provient donc pas d'une erreur de comptage : elle résulte précisément de la présence ou de l'absence d'une racine.</p>
-<p>Lorsque le nombre de blocs augmente encore, les effectifs cessent rapidement d'être représentables sous la forme d'une liste raisonnable. Pour m = 8 et 100 blocs, on obtient déjà des nombres comportant plus d'une centaine de chiffres. Leur ordre de grandeur dépasse d'environ un facteur 10²⁰ le nombre estimé d'atomes dans l'univers observable. À cette échelle, il ne s'agit plus de dessiner ou d'énumérer les objets un à un. Il faut changer de méthode.</p>
+The unrooted coefficients obey the same exponential growth \(\rho_m^{-n}\), since \(G_m\) has radius \(\rho_m\).
 
-<div class="chart-wrap" style="text-align:center;">
-<svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:560px; height:auto;">
-<polygon points="62.0,19.0 30.8,37.0 30.8,73.0 62.0,91.0 93.2,73.0 93.2,37.0" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<g fill="#1a1a1a"><circle cx="62.0" cy="19.0" r="2.6"/><circle cx="30.8" cy="37.0" r="2.6"/><circle cx="30.8" cy="73.0" r="2.6"/><circle cx="62.0" cy="91.0" r="2.6"/><circle cx="93.2" cy="73.0" r="2.6"/><circle cx="93.2" cy="37.0" r="2.6"/></g>
-<text x="62" y="116" font-family="Source Serif 4, serif" font-size="11.5" text-anchor="middle" fill="#4a4a4a">hexagone (m=6)</text>
-<polygon points="180.0,19.0 151.9,32.6 144.9,63.0 164.4,87.4 195.6,87.4 215.1,63.0 208.1,32.6" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<g fill="#1a1a1a"><circle cx="180.0" cy="19.0" r="2.6"/><circle cx="151.9" cy="32.6" r="2.6"/><circle cx="144.9" cy="63.0" r="2.6"/><circle cx="164.4" cy="87.4" r="2.6"/><circle cx="195.6" cy="87.4" r="2.6"/><circle cx="215.1" cy="63.0" r="2.6"/><circle cx="208.1" cy="32.6" r="2.6"/></g>
-<text x="180" y="116" font-family="Source Serif 4, serif" font-size="11.5" text-anchor="middle" fill="#4a4a4a">heptagone (m=7)</text>
-<polygon points="298.0,19.0 272.5,29.5 262.0,55.0 272.5,80.5 298.0,91.0 323.5,80.5 334.0,55.0 323.5,29.5" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<g fill="#1a1a1a"><circle cx="298.0" cy="19.0" r="2.6"/><circle cx="272.5" cy="29.5" r="2.6"/><circle cx="262.0" cy="55.0" r="2.6"/><circle cx="272.5" cy="80.5" r="2.6"/><circle cx="298.0" cy="91.0" r="2.6"/><circle cx="323.5" cy="80.5" r="2.6"/><circle cx="334.0" cy="55.0" r="2.6"/><circle cx="323.5" cy="29.5" r="2.6"/></g>
-<text x="298" y="116" font-family="Source Serif 4, serif" font-size="11.5" text-anchor="middle" fill="#4a4a4a">octogone (m=8)</text>
-<polygon points="416.0,19.0 392.9,27.4 380.5,48.7 384.8,73.0 403.7,88.8 428.3,88.8 447.2,73.0 451.5,48.7 439.1,27.4" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<g fill="#1a1a1a"><circle cx="416.0" cy="19.0" r="2.6"/><circle cx="392.9" cy="27.4" r="2.6"/><circle cx="380.5" cy="48.7" r="2.6"/><circle cx="384.8" cy="73.0" r="2.6"/><circle cx="403.7" cy="88.8" r="2.6"/><circle cx="428.3" cy="88.8" r="2.6"/><circle cx="447.2" cy="73.0" r="2.6"/><circle cx="451.5" cy="48.7" r="2.6"/><circle cx="439.1" cy="27.4" r="2.6"/></g>
-<text x="416" y="116" font-family="Source Serif 4, serif" font-size="11.5" text-anchor="middle" fill="#4a4a4a">ennéagone (m=9)</text>
-<polygon points="534.0,19.0 512.8,25.9 499.8,43.9 499.8,66.1 512.8,84.1 534.0,91.0 555.2,84.1 568.2,66.1 568.2,43.9 555.2,25.9" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<g fill="#1a1a1a"><circle cx="534.0" cy="19.0" r="2.6"/><circle cx="512.8" cy="25.9" r="2.6"/><circle cx="499.8" cy="43.9" r="2.6"/><circle cx="499.8" cy="66.1" r="2.6"/><circle cx="512.8" cy="84.1" r="2.6"/><circle cx="534.0" cy="91.0" r="2.6"/><circle cx="555.2" cy="84.1" r="2.6"/><circle cx="568.2" cy="66.1" r="2.6"/><circle cx="568.2" cy="43.9" r="2.6"/><circle cx="555.2" cy="25.9" r="2.6"/></g>
-<text x="534" y="116" font-family="Source Serif 4, serif" font-size="11.5" text-anchor="middle" fill="#4a4a4a">décagone (m=10)</text>
-</svg>
-<p style="font-size:13px; color:var(--ink-soft); margin-top:6px;">À partir de m = 6, les blocs sont des hexagones, puis des heptagones pour m = 7, des octogones pour m = 8, et ainsi de suite. Le principe de construction reste exactement le même ; seul le nombre de côtés de chaque polygone varie.</p>
-</div>
+\section{Strict monotonicity of the radius}
+\label{sec:mono}
+\begin{lemma}
+\label{lem:criterion}
+The map \(x\mapsto\partial_y\Phi_m\bigl(x,s_m(x)\bigr)\) increases from \(0\) to \(1\) on \([0,\rho_m)\). Consequently \(\rho_m<\rho_{m+1}\) if and only if \(\partial_y\Phi_{m+1}\bigl(\rho_m,s_{m+1}(\rho_m)\bigr)<1\).
+\end{lemma}
 
-<h2>Compter sans dessiner : la méthode</h2>
-<p>C'est précisément le rôle de la combinatoire énumérative, branche des mathématiques discrètes consacrée au comptage des structures. L'idée consiste à traduire la règle de construction - ici, « assembler des m-gones selon une structure d'arbre » - en une équation portant sur une série génératrice.</p>
-<p>Une fois cette équation obtenue, on peut en étudier les coefficients et déterminer leur comportement lorsque le nombre de blocs devient grand. L'analyse des singularités fait alors apparaître un paramètre ρₘ, dont l'inverse, 1/ρₘ, décrit le facteur de croissance asymptotique : il indique approximativement par quel nombre l'effectif est multiplié lorsqu'on ajoute un bloc.</p>
-<p>Ce facteur vaut environ 1,65 lorsque m = 5 et environ 1,15 lorsque m = 30. L'une des questions centrales du travail consiste précisément à comprendre comment cette quantité évolue lorsque la taille des polygones augmente.</p>
+\begin{proof}
+\(\partial_y\KC(x,y)\) is, by both branches of~\eqref{eq:KC}, a polynomial in \(y\) with non-negative coefficients, so \(x\mapsto\partial_y\Phi_m(x,s_m(x))=x\,e^{\KC+h}\,\partial_y\KC(x,s_m(x))\) is a product of non-negative, non-decreasing factors on \([0,\rho_m)\) (each factor of \(s_m\), \(e^{\KC+h}\), and \(\partial_y\KC\) has non-negative Taylor coefficients, hence is non-decreasing on the positive axis), hence itself non-decreasing; it is \(0\) at \(x=0\) and equals \(1\) at \(x=\rho_m\) by the defining system~\eqref{eq:crit}. The equivalence follows by evaluating this monotone map for \(\Phi_{m+1}\) at \(x=\rho_m\) instead of \(x=\rho_{m+1}\).
+\end{proof}
 
-<h2>À quoi servent les mathématiques discrètes et la combinatoire ?</h2>
-<p>Les mathématiques discrètes étudient des objets que l'on peut distinguer, organiser et compter : graphes, réseaux, arbres, permutations, assemblages ou configurations possibles. La combinatoire, qui en constitue l'un des grands domaines, cherche notamment à répondre à une question apparemment simple mais souvent extrêmement difficile : combien existe-t-il de structures possibles, et comment ce nombre évolue-t-il lorsque leur taille augmente ?</p>
-<p>Le travail du mathématicien ne consiste donc pas seulement à effectuer des calculs. Il consiste surtout à reconnaître une structure générale derrière un grand nombre de cas particuliers, à formuler les bonnes définitions et à découvrir des relations suffisamment profondes pour transformer un problème de comptage en un théorème.</p>
-<p>C'est aussi ce qui distingue une simple accumulation de résultats d'un véritable travail mathématique. Calculer les premiers termes d'une suite peut suggérer une régularité ; le rôle du chercheur est ensuite de comprendre pourquoi cette régularité apparaît, de déterminer dans quelles conditions elle reste vraie et, surtout, de le démontrer. Il faut souvent essayer plusieurs pistes, introduire de nouveaux objets, reformuler le problème ou abandonner une méthode qui semblait prometteuse. Le résultat final - un théorème et sa preuve - est généralement beaucoup plus court et plus ordonné que le chemin qui a permis de le découvrir.</p>
-<p>Ces recherches appartiennent aux mathématiques pures, mais les structures qu'elles étudient trouvent de nombreuses applications concrètes. Les graphes servent à modéliser des réseaux informatiques, des réseaux de transport ou des interactions entre molécules. Les arbres interviennent dans les algorithmes et les structures de données utilisées par les ordinateurs. Les méthodes de comptage permettent d'étudier le nombre de configurations possibles dans des systèmes physiques, biologiques ou chimiques, tandis que les séries génératrices et l'analyse asymptotique permettent de comprendre le comportement d'algorithmes lorsque la quantité de données devient très grande.</p>
-<p>Il existe cependant souvent un décalage entre la recherche fondamentale et ses applications. Le mathématicien peut commencer par étudier une structure abstraite pour elle-même, sans savoir nécessairement à quoi elle servira. C'est précisément cette liberté qui permet parfois de développer des outils généraux, réutilisables bien au-delà du problème qui les a fait naître. Des années plus tard, ces outils peuvent devenir utiles dans des domaines aussi différents que l'informatique, la physique, la biologie, les télécommunications ou l'optimisation.</p>
-<p>Dans ce sens, les mathématiques pures ne cherchent pas seulement à produire des réponses à des problèmes déjà connus. Elles construisent aussi le langage, les concepts et les méthodes qui permettront de formuler et de résoudre les problèmes de demain.</p>
+\begin{lemma}
+\label{lem:elem}
+Let \(f\) be strictly convex and strictly increasing on an interval containing \(u\le\tau\), with \(f(u)=u\) and \(f(\tau)<\tau\). Then \(f'(u)<1\).
+\end{lemma}
 
-<h2>Comment fabrique-t-on un théorème nouveau ?</h2>
-<p>C'est une question que l'on me pose souvent. La réponse tient en une idée simple : on part d'un cadre mathématique déjà connu et l'on cherche ce qu'il ne permet pas encore de démontrer.</p>
-<p>En 2018, Bahrani et Lumbroso avaient déjà établi l'équation générale qui régit ces cactus pour des cycles de longueur quelconque. Mais disposer d'une équation ne signifie pas encore connaître complètement le comportement de ses solutions.</p>
-<p>Pour les valeurs impaires de m, il a donc fallu chercher - puis trouver - une substitution permettant de résoudre cette équation sous une forme close. Pour les valeurs paires, en revanche, la même substitution échoue. Le travail a alors consisté à montrer que cet échec ne provenait pas d'un mauvais choix ou d'une étape manquante, mais d'une impossibilité structurelle. Cette impossibilité constitue elle-même un résultat nouveau.</p>
-<p>Une autre question, plus générale encore, concerne le taux de croissance. Intuitivement, on peut s'attendre à ce qu'il diminue lorsque les polygones deviennent plus grands : des blocs plus grands semblent, en quelque sorte, diluer davantage la structure. Une intuition, cependant, ne constitue pas une preuve.</p>
-<p>Il fallait donc démontrer rigoureusement que cette décroissance se produit pour chaque passage de m à m + 1, et non simplement l'observer sur un grand nombre d'exemples. Pour y parvenir, il a fallu construire une chaîne d'inégalités valable pour tout m supérieur ou égal à 5. Cette démonstration repose sur plusieurs propriétés techniques, notamment la convexité d'un certain opérateur. Ces propriétés n'étaient pas disponibles au départ : il a fallu les identifier, puis établir rigoureusement qu'elles étaient vérifiées.</p>
-<p>C'est cette succession d'arguments qui, une fois complète et démontrée ligne par ligne, devient un théorème.</p>
+\begin{proof}
+If \(f'(u)\ge 1\), then \(f'>1\) on \((u,\tau]\), so \(f(\tau)-f(u)>\tau-u\), hence \(f(\tau)>\tau\).
+\end{proof}
 
-<div class="analogy-box">
-On peut se représenter la différence entre calcul et démonstration à l'aide d'une rangée de dominos. Vérifier par le calcul que les trente premiers dominos tombent est utile, mais cela ne dit rien du trente et unième. Une preuve fonctionne autrement : elle établit une règle générale selon laquelle, chaque fois qu'un domino tombe, le suivant tombe également. Une fois cette règle démontrée pour n'importe quelle position n, elle vaut pour toute la rangée, même si celle-ci est infinie. Il n'est alors plus nécessaire de vérifier chaque domino séparément.
-<br><br>
-C'est précisément le rôle du Théorème 4.7. Il ne consiste pas à comparer séparément m = 5 à m = 6, puis m = 6 à m = 7, et ainsi de suite. Il établit une règle générale qui permet de contrôler l'évolution du taux pour toutes les valeurs de m. Autrement dit, la démonstration porte d'un seul coup sur une infinité de cas.
-</div>
+\begin{lemma}
+\label{lem:tau-lt-1}
+For every \(m\ge 5\), \(\tau_m\le\bigl(2/(m-1)\bigr)^{1/(m-1)}<1\).
+\end{lemma}
 
-<p>Les équations de départ proviennent du schéma de décomposition par split introduit par Bahrani et Lumbroso. En revanche, la résolution explicite dans le cas impair, la démonstration de l'impossibilité correspondante dans le cas pair, la localisation de la singularité, la croissance stricte de ρₘ ainsi que l'équivalent asymptotique faisant intervenir la fonction W de Lambert sont établis dans ce travail.</p>
-<p>Les Théorèmes 4.7 et 5.3 constituent ainsi les principaux résultats nouveaux.</p>
-<ul>
-<li><strong>Théorème 4.7.</strong> Le facteur de croissance décroît pour tout m supérieur ou égal à 5. Il ne s'agit donc pas d'une tendance observée sur les seules valeurs calculées, mais d'une propriété valable pour toutes les tailles de polygones.</li>
-<li><strong>Théorème 5.3.</strong> 1 − ρₘ se comporte comme (log m)/m, avec une constante exprimée à l'aide de la fonction W de Lambert.</li>
-</ul>
-<p>Cette fonction n'est d'ailleurs pas particulière à ce problème. Elle apparaît naturellement lorsqu'une quantité est définie par une équation dans laquelle elle intervient à la fois à l'intérieur et à l'extérieur d'une exponentielle, comme dans une relation du type u = 1 + e^(−u). Des mécanismes du même genre apparaissent, par exemple, dans l'étude de certains arbres aléatoires en informatique théorique. La présence de la fonction W de Lambert n'est donc pas une curiosité exotique : elle signale un type de mécanisme mathématique qui se retrouve dans de nombreux problèmes.</p>
+\begin{proof}
+Equality holds for \(m\) odd. For \(m\) even, \(A(\rho)\tau+\frac{m-1}{2}\tau^{m-1}=1\) with \(A\ge 0\).
+\end{proof}
 
-<h2>Pourquoi un ordinateur ne suffit pas</h2>
-<p>Un programme peut vérifier le résultat pour m = 5, puis pour m = 6, et continuer ainsi jusqu'à m = 30, ou beaucoup plus loin encore. Ces calculs sont utiles et peuvent fournir une grande quantité d'informations. Ils ne suffisent cependant pas à démontrer une propriété valable pour tout m.</p>
-<p>Quel que soit le nombre de valeurs testées, il en restera toujours une qui ne l'a pas été. Même un calcul extrêmement long ne peut donc, à lui seul, atteindre l'énoncé « pour tout m ».</p>
-<p>Une démonstration générale fonctionne différemment. La chaîne d'inégalités construite dans ce travail ne vérifie pas successivement une liste de cas : elle établit une règle valable pour l'ensemble de la famille. Elle couvre ainsi, en une seule démonstration, une infinité de valeurs de m, y compris celles que personne ne calculera jamais explicitement.</p>
-<p>C'est précisément cette construction théorique qui demande le plus de travail. Elle est souvent bien plus difficile à établir qu'un calcul numérique, aussi étendu soit-il. C'est pourtant elle, et non la vérification d'une longue table de valeurs, qui constitue la preuve.</p>
+Let \(\Phi_m\) denote the operator~\eqref{eq:Phi} at parameter \(m\), and define Picard iterates by \(s_m^{(0)}(x)=x\) and \(s_m^{(k+1)}=\Phi_m(x,s_m^{(k)})\). Nonnegative coefficients and the implicit species theorem~\cite[Prop.~2.5]{Pivoteau2012} give \(s_m^{(k)}\uparrow s_m\) on \([0,\rho_m]\). Each iterate has nonnegative coefficients, hence is increasing as a function of \(x\).
 
-<h2>Le rôle réel des scripts</h2>
-<p>Les scripts Python, PARI/GP et les fichiers Coq utilisés dans ce travail ne remplacent donc pas les démonstrations mathématiques.</p>
-<p>Leur rôle est différent. Ils permettent de vérifier certaines conséquences numériques, de produire des tables, d'explorer les valeurs jusqu'à m = 30 ou encore de mécaniser certains lemmes. Ces contrôles sont précieux pour détecter une erreur de calcul, un signe incorrect ou une incohérence dans une formule.</p>
-<p>Ils restent néanmoins des vérifications sur un nombre fini de cas. Un test, aussi étendu soit-il, ne peut jamais démontrer à lui seul une affirmation valable pour une infinité de valeurs.</p>
-<p>L'énoncé général repose donc sur la démonstration. Les calculs constituent une vérification complémentaire, une forme de sécurité supplémentaire permettant de contrôler les conséquences concrètes de la théorie. Cette page indique simplement ce qui a été testé et par quels outils.</p>
+\begin{theorem}
+\label{thm:weak}
+For every \(m\ge 5\), every \(k\ge 0\) and every \(x\in[0,\rho_m]\),
+\[
+s_{m+1}^{(k)}(x)\le s_m^{(k)}(x).
+\]
+In particular \(s_{m+1}(\rho_m)\le\tau_m\), so \(s_{m+1}(\rho_m)\) is finite.
+\end{theorem}
 
-<h2>Les suites de l'OEIS</h2>
-<p>À chaque valeur de m étudiée ici correspondent deux suites de nombres entiers : l'une pour les cactus enracinés (un sommet marqué), l'autre pour les cactus libres (sans marque). Ces suites ont été soumises à l'OEIS, l'Encyclopédie en ligne des suites de nombres entiers (voir <a href="https://fr.wikipedia.org/wiki/Encyclop%C3%A9die_en_ligne_des_suites_de_nombres_entiers">Wikipédia</a>) - une base de données de référence, fondée en 1964, aujourd'hui gérée par une fondation à but non lucratif et relue par des éditeurs bénévoles à travers le monde. Chaque suite y reçoit un numéro unique, commençant par la lettre A, qui permet de la retrouver et d'en vérifier le contenu.</p>
-<p>Les huit suites produites par ce travail ont ainsi été soumises et relues par ces éditeurs - une vérification externe supplémentaire, humaine celle-là, qui s'ajoute aux scripts. Elle ne remplace évidemment pas les preuves, mais elle ajoute un contrôle indépendant de plus.</p>
-<table class="oeis">
-<tr><th>m</th><th>enraciné</th><th>libre</th></tr>
-<tr><td>5</td><td><a href="https://oeis.org/A398033">A398033</a></td><td><a href="https://oeis.org/A397250">A397250</a></td></tr>
-<tr><td>6</td><td><a href="https://oeis.org/A398034">A398034</a></td><td><a href="https://oeis.org/A398035">A398035</a></td></tr>
-<tr><td>7</td><td><a href="https://oeis.org/A397210">A397210</a></td><td><a href="https://oeis.org/A398575">A398575</a></td></tr>
-<tr><td>8</td><td><a href="https://oeis.org/A397546">A397546</a></td><td>- (voir note ci-dessous)</td></tr>
-</table>
-<p style="font-size:14px; color:var(--ink-soft);">m = 8, libre : aucune entrée séparée n'est nécessaire - c'est déjà exactement la colonne k = 8 du tableau <a href="https://oeis.org/A332649">A332649</a>, qui cite directement cet article ; vérifié ici de façon indépendante par deux méthodes distinctes (<code>verify_pari_dissymmetry_even_m.gp</code>, <code>exhaustive_iso_m8.py</code>).</p>
+\begin{proof}
+The case \(k=0\) is an equality. Assume the claim at rank \(k\), for every index \(\ge 5\) and every point of the corresponding interval. Fix \(m\ge 5\) and \(x\in[0,\rho_m]\). Write \(u=s_{m+1}^{(k)}(x)\) and \(v=s_m^{(k)}(x)\), so \(0\le u\le v\). The same induction at the point \(x^2\le x\le\rho_m\) gives \(s_{m+1}^{(k)}(x^2)\le s_m^{(k)}(x^2)\). Moreover \(v\le s_m(x)\le s_m(\rho_m)=\tau_m<1\) by Lemma~\ref{lem:tau-lt-1}, hence \(u<1\).
 
-</div>
+\emph{Case \(m\) odd} (so \(m+1\) is even). Then
+\begin{align*}
+\KC_m(x)&=\tfrac12\bigl(v^{m-1}+s_m^{(k)}(x^2)^{(m-1)/2}\bigr),\\
+\KC_{m+1}(x)&=\tfrac12\bigl(u^{m}+u\cdot s_{m+1}^{(k)}(x^2)^{(m-1)/2}\bigr).
+\end{align*}
+Since \(0\le u\le v<1\),
+\[
+u^{m}=u\cdot u^{m-1}\le u^{m-1}\le v^{m-1}.
+\]
+For the reflection term,
+\[
+u\cdot s_{m+1}^{(k)}(x^2)^{(m-1)/2}\le s_{m+1}^{(k)}(x^2)^{(m-1)/2}\le s_m^{(k)}(x^2)^{(m-1)/2},
+\]
+using \(u\le 1\) and the induction at \(x^2\). Thus \(\KC_{m+1}(x)\le\KC_m(x)\). The same comparison at every \(x^i\), \(i\ge 2\), yields \(h_{m+1}(x)\le h_m(x)\), hence \(\Phi_{m+1}(x,u)\le\Phi_m(x,v)\), which is the claim at rank \(k+1\).
 
-<footer>
-  Frédéric G. Speyser - Independent Researcher, Association Sciences &amp; Cooperation, France.
-</footer>
+\emph{Case \(m\) even} (so \(m+1\) is odd). Then
+\begin{align*}
+\KC_m(x)&=\tfrac12\bigl(v^{m-1}+v\cdot s_m^{(k)}(x^2)^{(m-2)/2}\bigr),\\
+\KC_{m+1}(x)&=\tfrac12\bigl(u^{m}+s_{m+1}^{(k)}(x^2)^{m/2}\bigr).
+\end{align*}
+Again \(u^{m}\le v^{m-1}\). For the reflection,
+\[
+s_{m+1}^{(k)}(x^2)^{m/2}
+=s_{m+1}^{(k)}(x^2)\cdot s_{m+1}^{(k)}(x^2)^{(m-2)/2}
+\le s_m^{(k)}(x^2)\cdot s_m^{(k)}(x^2)^{(m-2)/2}.
+\]
+Since \(s_m^{(k)}\) is increasing and \(x^2\le x\), one has \(s_m^{(k)}(x^2)\le s_m^{(k)}(x)=v\), hence
+\[
+s_m^{(k)}(x^2)\cdot s_m^{(k)}(x^2)^{(m-2)/2}
+\le v\cdot s_m^{(k)}(x^2)^{(m-2)/2}.
+\]
+Thus \(\KC_{m+1}(x)\le\KC_m(x)\), and the argument closes as before.
 
-<script>
-function showTab(name) {
-  document.getElementById('tab-en').classList.toggle('active', name === 'en');
-  document.getElementById('tab-fr').classList.toggle('active', name === 'fr');
-  document.querySelectorAll('.tabbtn').forEach(function(b, i) {
-    b.classList.toggle('active', (name === 'en' && i === 0) || (name === 'fr' && i === 1));
-  });
-}
-</script>
+Passing to \(k\to\infty\) gives \(s_{m+1}(x)\le s_m(x)\) on \([0,\rho_m]\).
+\end{proof}
 
-</body>
-</html>
+The two parities cannot be merged: the even-to-odd step uses monotonicity of the iterates in the argument \(x^2<x\); the odd-to-even step uses \(s\le 1\) on both terms of \(\KC\).
+
+Let \(\widetilde\Phi_{m+1}\) be the operator obtained from \(\Phi_{m+1}\) by replacing every \(s_{m+1}(x^i)\), \(i\ge 2\), with \(s_m(x^i)\). Theorem~\ref{thm:weak} and monotonicity of the exponential yield \(\Phi_{m+1}(x,y)\le\widetilde\Phi_{m+1}(x,y)\) for \(x\in[0,\rho_m]\) and \(y\ge 0\).
+
+\begin{lemma}
+\label{lem:aux}
+\(\widetilde\Phi_{m+1}(\rho_m,\tau_m)<\tau_m\), hence \(\Phi_{m+1}(\rho_m,\tau_m)<\tau_m\).
+\end{lemma}
+
+\begin{proof}
+Write \(\widetilde{\KC}_{m+1}(\rho_m,\tau_m)\) for the kernel of \(\Phi_{m+1}\) evaluated at \(x=\rho_m\), \(y=\tau_m\), with every \(s_{m+1}(\rho_m^i)\), \(i\ge2\), frozen at the already-known value \(s_m(\rho_m^i)\). We compare it, monomial by monomial, to \(\KC_m(\rho_m,\tau_m)=\KC_m(\rho_m)\).
+
+\emph{Case \(m\) odd} (so \(m+1\) is even). By~\eqref{eq:KC},
+\begin{align*}
+\widetilde{\KC}_{m+1}(\rho_m,\tau_m)&=\tfrac12\bigl(\tau_m^{m}+\tau_m\,s_m(\rho_m^2)^{(m-1)/2}\bigr),\\
+\KC_m(\rho_m)&=\tfrac12\bigl(\tau_m^{m-1}+s_m(\rho_m^2)^{(m-1)/2}\bigr).
+\end{align*}
+Since \(0<\tau_m<1\) (Lemma~\ref{lem:tau-lt-1}), \(\tau_m^{m}=\tau_m\cdot\tau_m^{m-1}<\tau_m^{m-1}\) and \(\tau_m\,s_m(\rho_m^2)^{(m-1)/2}<s_m(\rho_m^2)^{(m-1)/2}\) (the second factor being strictly positive, as \(s_m(\rho_m^2)>0\)). Both monomials of \(\widetilde{\KC}_{m+1}(\rho_m,\tau_m)\) are therefore strictly smaller than the corresponding monomials of \(\KC_m(\rho_m)\), so \(\widetilde{\KC}_{m+1}(\rho_m,\tau_m)<\KC_m(\rho_m)\) already at this leading term.
+
+\emph{Case \(m\) even} (so \(m+1\) is odd). By~\eqref{eq:KC},
+\begin{align*}
+\widetilde{\KC}_{m+1}(\rho_m,\tau_m)&=\tfrac12\bigl(\tau_m^{m}+s_m(\rho_m^2)^{m/2}\bigr),\\
+\KC_m(\rho_m)&=\tfrac12\bigl(\tau_m^{m-1}+\tau_m\,s_m(\rho_m^2)^{(m-2)/2}\bigr).
+\end{align*}
+As above \(\tau_m^{m}<\tau_m^{m-1}\). For the second monomial, \(s_m\) is increasing and \(\rho_m^2<\rho_m\), so \(s_m(\rho_m^2)\le s_m(\rho_m)=\tau_m\); hence
+\[
+s_m(\rho_m^2)^{m/2}=s_m(\rho_m^2)\cdot s_m(\rho_m^2)^{(m-2)/2}\le\tau_m\cdot s_m(\rho_m^2)^{(m-2)/2},
+\]
+matching the second monomial of \(\KC_m(\rho_m)\) exactly. Again \(\widetilde{\KC}_{m+1}(\rho_m,\tau_m)<\KC_m(\rho_m)\), strictly by the first monomial alone.
+
+In both cases the leading term already gives a strict inequality; the termwise tail comparison of Theorem~\ref{thm:weak}, applied at \(x=\rho_m^i\), \(i\ge2\), with \(s_m(\rho_m^i)<1\) in place of \((\rho_m,\tau_m)\), gives \(\tilde h_{m+1}(\rho_m)\le h_m(\rho_m)\) for the remaining terms, non-strictly. The exponent of \(\widetilde\Phi_{m+1}(\rho_m,\tau_m)\) is therefore strictly smaller than that of \(\Phi_m(\rho_m,\tau_m)=\tau_m/\rho_m\), and so is the exponential after multiplication by \(\rho_m\).
+\end{proof}
+
+\begin{lemma}
+\label{lem:convex}
+For \(x\in(0,\rho_m]\), the map \(y\mapsto\Phi_m(x,y)\) is strictly convex on \((0,\infty)\).
+\end{lemma}
+
+\begin{proof}
+Both branches of~\eqref{eq:KC} satisfy \(\partial_y^2\KC>0\) for \(y>0\) and \(m\ge 5\), and \(x\,e^{\KC+h}>0\).
+\end{proof}
+
+\begin{theorem}
+\label{thm:mono}
+For every \(m\ge 5\), \(\rho_m<\rho_{m+1}\). Equivalently, \(\mu_m=1/\rho_m\) is strictly decreasing.
+\end{theorem}
+
+\begin{proof}
+Let \(f(y)=\Phi_{m+1}(\rho_m,y)\). By Lemma~\ref{lem:convex}, \(f\) is strictly convex; it is also strictly increasing, \(u:=s_{m+1}(\rho_m)\) is a fixed point of \(f\), and \(u\le\tau_m\) by Theorem~\ref{thm:weak}. Lemma~\ref{lem:aux} gives \(f(\tau_m)<\tau_m\). Lemma~\ref{lem:elem} yields \(f'(u)<1\). Lemma~\ref{lem:criterion} yields \(\rho_m<\rho_{m+1}\).
+\end{proof}
+
+\section{\texorpdfstring{The large-\(m\) limit}{The large-m limit}}
+\label{sec:limit}
+Throughout this section write \(n=m-1\) and \(u_m=n\bigl(\KC(\rho_m)+h_m(\rho_m)\bigr)\), so that \(\tau_m=\rho_m e^{u_m/n}\) and \(\rho_m\le\tau_m\).
+
+\begin{lemma}
+\label{lem:tails}
+\(\KC(\rho_m)+h_m(\rho_m)\to 0\). More precisely \(h_m(\rho_m)=O(m^{-2})\) and \(\KC(\rho_m)=O(m^{-1})\).
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:tau-lt-1}, \(\tau_m^{m-1}\le 2/n\). Since \(s_m(x)/x\) is increasing, \(s_m(\rho_m^i)\le\tau_m\rho_m^{i-1}\). Hence
+\[
+s_m(\rho_m^i)^{m-1}\le\frac2n\,\rho_m^{n(i-1)},
+\]
+and \(\rho_m^{n}\le\tau_m^{n}\le 2/n\). Summing the identity part of the tail gives
+\[
+\sum_{i\ge 2}\frac1i\,s_m(\rho_m^i)^{m-1}\le\frac2n\cdot\frac{\rho_m^{n}}{1-\rho_m^{n}}\le\frac4{n(n-2)}.
+\]
+The reflection part of \(h_m\) is of the same order. The bound on \(\KC(\rho_m)\) is \(\frac1n+\frac12\tau_m^{n/2}=O(m^{-1})\).
+\end{proof}
+
+\begin{theorem}
+\label{thm:rho-to-1}
+One has \(\rho_m\to 1\) and \(\mu_m\to 1\). Combined with Theorem~\ref{thm:mono}, the sequence \((\rho_m)_{m\ge 5}\) is strictly increasing and convergent to \(1\).
+\end{theorem}
+
+\begin{proof}
+Lemmas~\ref{lem:tau-lt-1} and~\ref{lem:tails} give \(\tau_m\to 1\) and \(u_m/n\to 0\), hence \(\rho_m=\tau_m e^{-u_m/n}\to 1\).
+\end{proof}
+
+Let \(\Omega=W(e^{-1})\) be the principal Lambert value~\cite{Corless1996} satisfying \(\Omega e^{\Omega}=e^{-1}\), so \(\Omega\approx 0.27846454276\) and \(1+\Omega\) is the unique root of \(u=1+e^{-u}\) in \([1,2]\). Set
+\begin{equation}
+\label{eq:lambda}
+\lambda_m=\frac{\log(n/2)+1+\Omega}{n}.
+\end{equation}
+
+\begin{theorem}
+\label{thm:equiv}
+As \(m\to\infty\),
+\begin{equation}
+\label{eq:equiv}
+1-\rho_m=\lambda_m-\tfrac12\lambda_m^2+O\Bigl(\frac{\log m}{m^2}\Bigr).
+\end{equation}
+In particular \(1-\rho_m\sim(\log m)/m\) and \(\mu_m=1+\lambda_m+O\bigl((\log m)^2/m^2\bigr)\). Moreover \(\tau_m^{m-1}\sim 2/(m-1)\) in both parities, and \(u_m=1+\Omega+O(m^{-1})\).
+\end{theorem}
+
+\begin{proof}
+We first take \(m\) odd, so \(\tau_m^{n}=2/n\) exactly.
+
+\emph{Reduction of \(s_m(\rho_m^2)\).}
+Write \(\delta_m=s_m(\rho_m^2)/\rho_m^2-1\). The first nonlinear term of \(s_m\) has degree \(m\), and \(s_m(\rho_m)-\rho_m=O(m^{-1})\) by Lemma~\ref{lem:tails}. For degrees \(\ge m\), \(\rho_m^{2j}\le\rho_m^m\rho_m^{j}\), hence \(\delta_m=O(\rho_m^{m-2})=O(m^{-2})\). In fact the leading contribution is \(\delta_m\sim\rho_m^{2n}=O(m^{-2})\).
+
+\emph{Fixed point for \(u_m\).}
+Then \(s_m(\rho_m^2)^{n/2}=\rho_m^{n}(1+\delta_m)^{n/2}=\rho_m^{n}(1+O(m^{-1}))\), and \(\rho_m^{n}=(2/n)e^{-u_m}\). Thus
+\[
+n\,\KC(\rho_m)=1+e^{-u_m}(1+O(m^{-1})).
+\]
+The tail satisfies \(n\,h_m(\rho_m)=O(m^{-1})\): the summand \(i=2\) is \(O(\rho_m^{2n}n)=O(m^{-1})\), and \(i\ge 3\) is smaller. Therefore \(u_m=1+e^{-u_m}+O(m^{-1})\). Linearising \(u\mapsto u-1-e^{-u}\) at \(1+\Omega\), where the derivative is \(1+\Omega\neq 0\), yields \(u_m=1+\Omega+O(m^{-1})\).
+
+\emph{Transfer.}
+Now \(-\log\rho_m=\bigl(\log(n/2)+u_m\bigr)/n=\lambda_m+O(m^{-2})\). The expansion \(1-e^{-\Lambda}=\Lambda-\Lambda^2/2+O(\Lambda^3)\) with \(\Lambda=-\log\rho_m\) gives~\eqref{eq:equiv}.
+
+\emph{Even \(m\).}
+Proposition~\ref{prop:obstruction} reads \(A(\rho_m)\tau_m+\frac n2\tau_m^{n}=1\). As above \(s_m(\rho_m^2)\sim\rho_m^2\), so
+\[
+A(\rho_m)\tau_m=\tfrac12 s_m(\rho_m^2)^{(n-1)/2}\tau_m\sim\tfrac12\rho_m^{n-1}\tau_m\sim\tfrac12\rho_m^{n}.
+\]
+Combined with the critical relation this forces \(\tau_m^{n}\sim 2/n\), exactly as in the odd case. We now determine the precise order of \(A(\rho_m)\tau_m\) rather than only its crude majorant. Using \(\tau_m^{n-1}\sim\tau_m^n/\tau_m\sim2/n\) (since \(\tau_m\to1\)) and \(\tau_m\to1\) again,
+\[
+A(\rho_m)\tau_m\sim\tfrac12\rho_m^{n-1}\tau_m\sim\tfrac1n\rho_m^{n}\cdot\tau_m/\rho_m\sim\tfrac1n\rho_m^n,
+\]
+and since \(\rho_m^n=\tau_m^ne^{-u_m}\sim(2/n)e^{-u_m}\), this gives the precise asymptotic \(A(\rho_m)\tau_m\sim e^{-u_m}/n\) -- not merely \(O(m^{-1})\), but a leading coefficient tied self-consistently to \(u_m\) itself. Consequently
+\[
+n\,\KC(\rho_m)=n\bigl(\tfrac12\tau_m^{n}+A\tau_m\bigr)=1+(n-1)A(\rho_m)\tau_m\sim1+\frac{n-1}{n}e^{-u_m}\longrightarrow1+e^{-u_m}
+\]
+as \(n\to\infty\), recovering exactly the same self-consistent relation \(n\,\KC(\rho_m)\sim1+e^{-u_m}\) as the odd case, term by term rather than merely up to an unspecified \(O(m^{-1})\). The tail estimate \(n\,h_m(\rho_m)=O(m^{-1})\) is established by the same argument as the odd case, without using parity, so \(u_m=1+e^{-u_m}+O(m^{-1})\) follows exactly as before, and the same linearisation at \(1+\Omega\) applies. The transfer step did not use parity.
+\end{proof}
+
+The second term \(-\frac12\lambda_m^2\) is forced by \(1-e^{-\lambda}=\lambda-\lambda^2/2\); it is not an adjustable correction.
+
+\begin{remark}[Why a Lambert-\(W\) constant appears]
+The appearance of \(\Omega=W(e^{-1})\) is not particular to cactus graphs. It is a generic feature of the smooth implicit-function schema~\cite[§VII.4]{FlajoletSedgewick2009} whenever the dominant term of the kernel is a single power \(y^{d}\) homogeneous of some degree \(d\) growing with the parameter (here \(d=m-1\)): writing the criticality condition \(\Phi_h=1\) forces, after the scaling \(u=d(\KC(\rho)+h(\rho))\) used throughout this section, a fixed-point equation of the shape \(u=c+e^{-u}\) for some constant \(c\) depending only on the schema's normalisation (here \(c=1\), from the single homogeneous term \(\tfrac12h^{m-1}\)), whose solution is \(u=c+W(e^{-c})\) by the same substitution \(v=u-c\), \(v\,e^{v}=e^{-c}\) used in the proof of Theorem~\ref{thm:equiv}. The classical Cayley-tree equation \(T=xe^{T}\) is the best-known instance producing a Lambert-\(W\) singularity by this same general mechanism; the present equation \(u=1+e^{-u}\) is a different instance of it, arising from a different schema, not the Cayley equation evaluated at a matching point. What is shared is the mechanism -- a single dominant homogeneous term meeting the criticality condition -- not the equation itself.
+\end{remark}
+
+\section{Numerical values}
+\label{sec:num}
+Table~\ref{tab:crit} records solutions of~\eqref{eq:crit}. For odd \(m\), \(\tau_m\) matches Theorem~\ref{thm:tau-odd} to all computed digits. Figure~\ref{fig:growth} displays the resulting growth rates against the two-term approximation \(1+\lambda_m-\frac12\lambda_m^2\).
+
+\begin{table}[ht]
+\centering
+\caption{Critical data. For odd \(m\), \(\tau_m\) is closed-form.}
+\label{tab:crit}
+\begin{tabular}{cccccc}
+\toprule
+\(m\) & \(\rho_m\) & \(\tau_m\) & \(\mu_m\) & \(\Phi_{hh}\) & \(C_m\) \\
+\midrule
+\(5\)  & \(0.604765\) & \(0.840896\) & \(1.6535\) & \(2.8768\) & \(0.7905\) \\
+\(6\)  & \(0.633235\) & \(0.821008\) & \(1.5792\) & \(3.6484\) & \(0.8736\) \\
+\(7\)  & \(0.669930\) & \(0.832683\) & \(1.4927\) & \(4.8273\) & \(0.9451\) \\
+\(8\)  & \(0.690268\) & \(0.830566\) & \(1.4487\) & \(5.5898\) & \(1.0312\) \\
+\(9\)  & \(0.71494\)  & \(0.840896\) & \(1.3987\) & --- & --- \\
+\(10\) & \(0.73011\)  & \(0.84280\)  & \(1.3697\) & --- & --- \\
+\(11\) & \(0.74803\)  & \(0.85134\)  & \(1.3368\) & --- & --- \\
+\(12\) & \(0.75973\)  & \(0.85425\)  & \(1.3163\) & --- & --- \\
+\(15\) & \(0.79368\)  & \(0.87023\)  & \(1.2600\) & --- & --- \\
+\(20\) & \(0.82948\)  & \(0.88753\)  & \(1.2056\) & --- & --- \\
+\(25\) & \(0.85466\)  & \(0.90164\)  & \(1.1701\) & --- & --- \\
+\(30\) & \(0.87215\)  & \(0.91160\)  & \(1.1466\) & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[x=0.30cm,y=4.6cm]
+  \draw[->] (4.6,0.95) -- (31.6,0.95) node[right] {\small $m$};
+  \draw[->] (4.6,0.95) -- (4.6,1.78) node[above] {\small $\mu_m$};
+  \foreach \x in {5,10,15,20,25,30}
+    \draw (\x,0.93) -- (\x,0.97) node[below] {\scriptsize \x};
+  \foreach \y in {1.0,1.2,1.4,1.6}
+    \draw (4.15,\y) -- (4.68,\y) node[left] {\scriptsize \y};
+  \draw[densely dotted] (4.6,1.0) -- (31.4,1.0);
+  % computed mu (m=5..12, 15,18,20,22,25,28,30)
+  \fill (5,1.6535)  circle (1.5pt);
+  \fill (6,1.5792)  circle (1.5pt);
+  \fill (7,1.4927)  circle (1.5pt);
+  \fill (8,1.4487)  circle (1.5pt);
+  \fill (9,1.3987)  circle (1.5pt);
+  \fill (10,1.3698) circle (1.5pt);
+  \fill (11,1.3369) circle (1.5pt);
+  \fill (12,1.3163) circle (1.5pt);
+  \fill (15,1.2600) circle (1.5pt);
+  \fill (18,1.2246) circle (1.5pt);
+  \fill (20,1.2056) circle (1.5pt);
+  \fill (22,1.1899) circle (1.5pt);
+  \fill (25,1.1701) circle (1.5pt);
+  \fill (28,1.1553) circle (1.5pt);
+  \fill (30,1.1466) circle (1.5pt);
+  \draw (5,1.6535)--(6,1.5792)--(7,1.4927)--(8,1.4487)--(9,1.3987)--(10,1.3698)--(11,1.3369)--(12,1.3163)
+        --(15,1.2600)--(18,1.2246)--(20,1.2056)--(22,1.1899)--(25,1.1701)--(28,1.1553)--(30,1.1466);
+  % two-term 1 + lambda - lambda^2/2, computed independently for every point above
+  \draw[dashed]
+    (5,1.3714)--(6,1.3425)--(7,1.3177)--(8,1.2962)--(9,1.2776)--(10,1.2613)--(11,1.2471)--(12,1.2344)
+    --(15,1.2038)--(18,1.1809)--(20,1.1685)--(22,1.1579)--(25,1.1445)--(28,1.1334)--(30,1.1270);
+  % legend box, placed in the empty upper-right region, well clear of both curves
+  \draw (20.3,1.44) rectangle (31.3,1.75);
+  \draw (20.9,1.68) -- (22.5,1.68);
+  \fill (21.7,1.68) circle (1.5pt);
+  \node[font=\scriptsize, anchor=west] at (22.8,1.68) {computed $\mu_m$};
+  \draw[dashed] (20.9,1.55) -- (22.5,1.55);
+  \node[font=\scriptsize, anchor=west] at (22.8,1.55) {$1+\lambda_m-\frac12\lambda_m^2$};
+\end{tikzpicture}
+\caption{Exponential growth rate \(\mu_m=1/\rho_m\) for \(m=5,\dots,12,15,18,20,22,25,28,30\) (solid). The dashed line is the two-term approximation of Theorem~\ref{thm:equiv}. The dotted line is the limit \(1\). The gap between the two curves, rescaled by \(m^2/\log m\), stays within \([4.4,5.2]\) across this entire range (see the remark following Table~\ref{tab:check}).}
+\label{fig:growth}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Check of Theorem~\ref{thm:equiv} against Table~\ref{tab:crit}.}
+\label{tab:check}
+\begin{tabular}{cccc}
+\toprule
+\(m\) & \(1-\rho_m\) & \(\lambda_m\) & \(\lambda_m-\frac12\lambda_m^2\) \\
+\midrule
+\(5\) & \(0.3952\) & \(0.4929\) & \(0.3714\) \\
+\(7\) & \(0.3301\) & \(0.3962\) & \(0.3177\) \\
+\(9\) & \(0.2851\) & \(0.3331\) & \(0.2776\) \\
+\(15\) & \(0.2063\) & \(0.2303\) & \(0.2038\) \\
+\(20\) & \(0.1705\) & \(0.1858\) & \(0.1685\) \\
+\(30\) & \(0.1279\) & \(0.1363\) & \(0.1270\) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As Table~\ref{tab:check} shows, the two-term truncation already absorbs most of the overestimate of \(\lambda_m\). The residual is of the order claimed in~\eqref{eq:equiv}; extending the same comparison to the remaining points of Figure~\ref{fig:growth} (\(m=18,22,25,28\)) confirms the ratio (residual)\(\times m^2/\log m\) stabilises between \(4.4\) and \(5.2\) over the entire range \(m=5,\dots,30\), consistent with the stated \(O((\log m)/m^2)\) and not merely with a looser bound. Small-\(n\) ratios of the transfer formula of Theorem~\ref{thm:asymp} to the exact coefficients of Table~\ref{tab:rooted} lie between \(1.05\) and \(1.12\) and decrease with \(n\).
+
+\section{Concluding remarks}
+The paper executes the singleton case \(\Omega=\{m\}\) of the free template of~\cite{Bahrani2018ANALCO}: solved equations, a parity dichotomy for \(\tau_m\), square-root asymptotics, strict increase of \(\rho_m\), and the equivalent~\eqref{eq:equiv}. The identity \(\Phi_{hh}=(m-1)\rho_m/\tau_m\) for odd \(m\), and the constant \(1+W(e^{-1})\) in \(\lambda_m\), both come from the same structural fact: the outer kernel is a single homogeneous term of degree \(m-1\), up to a reflection term within \(\KC\) itself (not the outer tail \(h_m\) of Section~\ref{sec:sing}) that scales to \(e^{-u}\) after multiplication by \(m-1\).
+
+A one-term closed form for \(\tau_m\) when \(m\) is even is not supplied by the critical substitution, and the infinite orbit \(\rho,\rho^2,\rho^4,\dots\) makes a finite algebraic elimination of \(s_m(\rho_m^2)\) implausible. The equivalent \(\tau_m^{m-1}\sim 2/(m-1)\) remains valid. No species injection explaining \(\rho_m<\rho_{m+1}\) is known. Extensions to a mixed set \(\Omega\), or to block-cacti, change the kernel and remove the successor \(m\mapsto m+1\); they are not treated here.
+
+\section*{Data availability}
+Scripts verifying the enumerative coefficients of Tables~\ref{tab:rooted}--\ref{tab:unrooted} (Sections~\ref{sec:grammar}--\ref{sec:sing}) are available at
+\url{https://github.com/frederic-speyser/non-plane-mgonal-cacti}
+and archived at \url{https://doi.org/10.5281/zenodo.21461100}.
+
+Scripts verifying the critical data of Table~\ref{tab:crit} (including an independent recomputation of \(\Phi_y\) and \(\Phi_{hh}\) by finite differences, and the extended range \(m=15,\dots,30\) underlying Figure~\ref{fig:growth}), the strict monotonicity argument of Section~\ref{sec:mono}, and the large-\(m\) asymptotic of Section~\ref{sec:limit}, are available at
+\url{https://github.com/frederic-speyser/cactus-growth-rate-monotonicity}, archived at \url{https://doi.org/10.5281/zenodo.21840267}. Three components of the argument (Lemma~\ref{lem:convex}; the operator-monotonicity step of Theorem~\ref{thm:weak}, with its genuine infinite series; and an abstract involution-counting principle, instantiated for \(m=5\)) are additionally machine-checked in Coq in that repository; this covers specific lemmas, not Theorem~\ref{thm:mono} in its entirety.
+
+\section*{Acknowledgements}
+The enumerative data of this paper was cross-checked against the OEIS (On-Line Encyclopedia of Integer Sequences) during preparation. Andrew Howroyd observed that the coefficients of Section~\ref{sec:grammar} coincide with columns of his own arrays A332648 and A332649, and verified them independently. Sean~A.\ Irvine, the OEIS's Managing Editor, Stefano Spezia, Robert~C.\ Lyons, and Michael De~Vlieger reviewed the corresponding OEIS submissions, and Shenghui Yang contributed an independent \textsc{Mathematica} implementation for A397210.
+
+\begin{thebibliography}{99}
+\bibitem{Bahrani2018EJC}
+M.~Bahrani and J.~Lumbroso,
+Enumerations, forbidden subgraph characterizations, and the split-decomposition,
+\emph{Electron.\ J.\ Combin.}~\textbf{25} (2018), \#P4.47.
+\bibitem{Bahrani2018ANALCO}
+M.~Bahrani and J.~Lumbroso,
+Split-decomposition trees with prime nodes: enumeration and random generation of cactus graphs,
+in \emph{Proc.\ ANALCO 2018}, SIAM, 2018, pp.~143--157.
+\bibitem{BergeronLabelleLeroux1998}
+F.~Bergeron, G.~Labelle and P.~Leroux,
+\emph{Combinatorial Species and Tree-like Structures},
+Cambridge University Press, Cambridge, 1998.
+\bibitem{Bona2000}
+M.~Bóna, M.~Bousquet, G.~Labelle and P.~Leroux,
+Enumeration of $m$-ary cacti,
+\emph{Adv.\ Appl.\ Math.}~\textbf{24} (2000), 22--64.
+\bibitem{Corless1996}
+R.~M.~Corless, G.~H.~Gonnet, D.~E.~G.~Hare, D.~J.~Jeffrey and D.~E.~Knuth,
+On the Lambert $W$ function,
+\emph{Adv.\ Comput.\ Math.}~\textbf{5} (1996), 329--359.
+\bibitem{Cunningham1982}
+W.~H.~Cunningham,
+Decomposition of directed graphs,
+\emph{SIAM J.\ Algebraic Discrete Methods}~\textbf{3} (1982), 214--228.
+\bibitem{FlajoletSedgewick2009}
+P.~Flajolet and R.~Sedgewick,
+\emph{Analytic Combinatorics},
+Cambridge University Press, 2009.
+\bibitem{GioanPaul2012}
+E.~Gioan and C.~Paul,
+Split decomposition and graph-labelled trees,
+\emph{Discrete Appl.\ Math.}~\textbf{160} (2012), 708--733.
+\bibitem{Pivoteau2012}
+C.~Pivoteau, B.~Salvy and B.~Soria,
+Algorithms for combinatorial structures: well-founded systems and Newton iterations,
+\emph{J.\ Combin.\ Theory Ser.~A}~\textbf{119} (2012), 1711--1773.
+\end{thebibliography}
+
+\end{document}
